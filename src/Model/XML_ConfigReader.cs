@@ -1,0 +1,152 @@
+﻿using System.Xml.Linq;
+
+namespace TheMover.Model
+{
+    public class XML_ConfigReader : IConfigReader
+    {
+        public XML_ConfigReader()
+        {
+            _WriteOptions.Mode = FileMode.Truncate;
+            _WriteOptions.Access = FileAccess.Write;
+            _WriteOptions.Share = FileShare.Write;
+            _WriteOptions.Options = FileOptions.None;
+
+            _ReadOptions.Mode = FileMode.OpenOrCreate;
+            _ReadOptions.Access = FileAccess.Read;
+            _ReadOptions.Share = FileShare.Read;
+            _ReadOptions.Options = FileOptions.None;
+        }
+
+        #region Konstanten für Config Pfad und Inhalt
+
+        private FileStreamOptions _WriteOptions = new FileStreamOptions();
+        private FileStreamOptions _ReadOptions = new FileStreamOptions();
+
+        private const string _ConfigPath = "./Config.xml";
+        private const string _ElementName_Preset = "Preset";
+        private const string _AttributeName_DisplayName = "DisplayName";
+        private const string _AttributeName_DestinationPath = "DestinationPath";
+
+        private const string _ElementName_SourcePath = "SourcePath";
+
+        #endregion Konstanten für Config Pfad und Inhalt
+
+        public void SaveConfig(List<Preset> presetsToSave)
+        {
+            var rootElement = new XElement(XName.Get("root"));
+
+            foreach (var preset in presetsToSave)
+            {
+                var xmlPreset = new XElement(XName.Get(_ElementName_Preset));
+                xmlPreset.Add(new XAttribute(XName.Get(_AttributeName_DisplayName), preset.DisplayName));
+                xmlPreset.Add(new XAttribute(XName.Get(_AttributeName_DestinationPath), preset.DestiantionPath));
+
+                foreach (var sourcePath in preset.SourceFiles)
+                {
+                    xmlPreset.Add(new XElement(XName.Get(_ElementName_SourcePath), sourcePath));
+                }
+
+                rootElement.Add(xmlPreset);
+            }
+
+            var resultDocument = new XDocument();
+            resultDocument.Add(rootElement);
+
+            using (var configWriter = new StreamWriter(_ConfigPath, _WriteOptions))
+            {
+                resultDocument.Save(configWriter);
+            }
+        }
+
+        public List<Preset> ReadConfig()
+        {
+            if (!File.Exists(_ConfigPath))
+            {
+                return new List<Preset>();
+            }
+
+            // #Todo JCI - Configvalidation should happen here
+
+            XElement[] presetsFromConfig;
+            using (var configReader = new FileStream(_ConfigPath, _ReadOptions))
+            {
+                presetsFromConfig = XDocument.Load(configReader).Descendants(XName.Get(_ElementName_Preset)).ToArray();
+            }
+
+            var result = new List<Preset>();
+            int errorCount = 0;
+            for (int i = 0; i < presetsFromConfig.Length; i++)
+            {
+                bool error = false;
+
+                string displayName;
+                {
+                    var presetNameElement = presetsFromConfig[i].Attribute(XName.Get(_AttributeName_DisplayName));
+                    if (null != presetNameElement)
+                        displayName = presetNameElement.Value;
+                    else displayName = "Unnamed Preset";
+                }
+
+                string destinationPath;
+                {
+                    var destinationElement = presetsFromConfig[i].Attribute(XName.Get(_AttributeName_DestinationPath));
+                    if (null != destinationElement)
+                        destinationPath = destinationElement.Value;
+                    else
+                    {
+                        destinationPath = "";
+                        error = true;
+                    }
+                }
+
+                var sourceFiles = new List<string>();
+                {
+                    foreach (var sourceFileElement in presetsFromConfig[i].Descendants(XName.Get(_ElementName_SourcePath)))
+                    {
+                        if (null == sourceFileElement)
+                        {
+                            continue;
+                        }
+
+                        string sourcePath = sourceFileElement.Value;
+                        if (sourcePath == string.Empty)
+                        {
+                            continue;
+                        }
+
+                        sourceFiles.Add(sourcePath);
+
+                    }
+
+                    if (sourceFiles.Count < 1)
+                    {
+                        error = true;
+                    }
+                }
+
+                // #Todo - A validity Check could be done here
+
+                if (!error)
+                {
+                    result.Add(new Preset(displayName, sourceFiles, destinationPath));
+                }
+                else
+                {
+                    errorCount++;
+                }
+            }
+
+            if (errorCount > 0)
+            {
+                string backupFileName = "FaultyConfig" + DateTime.Now.ToString("-yyyy-MM-dd_HH-mm-ss") + ".xml";
+                var backupDirectoryInfo = Directory.CreateDirectory("./Backup");
+
+                string backupFileFullName = string.Concat(backupDirectoryInfo.FullName, "/", backupFileName);
+
+                File.Copy(_ConfigPath, backupFileFullName);
+                MessageBox.Show($"{errorCount} errors detected while reading the config.\r\nBackup file of faulty config created under: {backupFileFullName}\r\nFaulty conig elements will be removed automatically");
+            }
+            return result;
+        }
+    }
+}
