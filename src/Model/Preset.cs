@@ -1,42 +1,38 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace File_Switcher.Model {
-  public class Preset : INotifyPropertyChanged {
-    public Preset(string displayName, List<string> sourceFiles, string destnationPath) {
-      this.DisplayName = displayName;
-      this.SourceFiles = sourceFiles;
-      this.DestiantionPath = destnationPath;
+namespace TheMover.Model {
+    internal struct Preset {
+        /// <summary>
+        /// #Todo
+        /// </summary>
+        /// <param name="presetName"></param>
+        /// <param name="sourceFiles"></param>
+        /// <param name="destnationPath"></param>
+        /// <exception cref="ArgumentException"></exception>
+        internal Preset(string presetName, List<string> sourceFiles, string destnationPath) {
+            PresetName = presetName;
+            SourceFiles = sourceFiles;
+            DestiantionPath = destnationPath;
+
+            if (sourceFiles.Count == 0) {
+                throw new ArgumentException("At least one SourceFile must be specified!");
+            }
+        }
+
+        /// <summary>
+        /// The name of this Preset.
+        /// </summary>
+        internal string PresetName { private set; get; }
+        
+        /// <summary>
+        /// A list of Fullpaths that ist guaranteed to at least contain one item.
+        /// </summary>
+        internal List<string> SourceFiles { private set; get; }
+
+        /// <summary>
+        /// The Destinationpath of this Preset.
+        /// </summary>
+        internal string DestiantionPath { private set; get; }
     }
-
-    #region Properties
-    private string _DisplayName = "";
-    public string DisplayName {
-      get => _DisplayName;
-      set { _DisplayName = value; OnPropertyChanged(); }
-    }
-
-    private List<string> _SourceFiles = new List<string>();
-    public List<string> SourceFiles {
-      get => _SourceFiles;
-      set { _SourceFiles = value; OnPropertyChanged(); }
-    }
-
-    private string _DestiantionPath = "";
-    public string DestiantionPath {
-      get => _DestiantionPath;
-      set { _DestiantionPath = value; OnPropertyChanged(); }
-    }
-
-    #endregion Properties
-
-    #region Property Changed
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected void OnPropertyChanged([CallerMemberName] string? name = null) {
-      PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-    }
-
-    #endregion Property Changed
-  }
 }
