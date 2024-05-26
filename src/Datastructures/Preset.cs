@@ -1,8 +1,7 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
-
-namespace TheMover.Model {
-    internal struct Preset {
+﻿namespace TheMover.Datastructures
+{
+    internal struct Preset
+    {
         /// <summary>
         /// #Todo
         /// </summary>
@@ -10,12 +9,14 @@ namespace TheMover.Model {
         /// <param name="sourceFiles"></param>
         /// <param name="destnationPath"></param>
         /// <exception cref="ArgumentException"></exception>
-        internal Preset(string presetName, List<string> sourceFiles, string destnationPath) {
+        internal Preset(string presetName, List<string> sourceFiles, string destnationPath)
+        {
             PresetName = presetName;
             SourceFiles = sourceFiles;
             DestiantionPath = destnationPath;
 
-            if (sourceFiles.Count == 0) {
+            if (sourceFiles.Count == 0)
+            {
                 throw new ArgumentException("At least one SourceFile must be specified!");
             }
         }
@@ -24,7 +25,7 @@ namespace TheMover.Model {
         /// The name of this Preset.
         /// </summary>
         internal string PresetName { private set; get; }
-        
+
         /// <summary>
         /// A list of Fullpaths that ist guaranteed to at least contain one item.
         /// </summary>

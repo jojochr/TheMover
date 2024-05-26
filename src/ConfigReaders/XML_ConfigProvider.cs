@@ -1,44 +1,54 @@
 ﻿using System.Xml.Linq;
 
-namespace TheMover.Model
-{
-    public class XML_ConfigReader : IConfigReader
-    {
-        public XML_ConfigReader()
-        {
-            _WriteOptions.Mode = FileMode.Truncate;
-            _WriteOptions.Access = FileAccess.Write;
-            _WriteOptions.Share = FileShare.Write;
-            _WriteOptions.Options = FileOptions.None;
+using FluentResults;
+using TheMover.Datastructures;
 
-            _ReadOptions.Mode = FileMode.OpenOrCreate;
-            _ReadOptions.Access = FileAccess.Read;
-            _ReadOptions.Share = FileShare.Read;
-            _ReadOptions.Options = FileOptions.None;
+namespace TheMover.ConfigReaders
+{
+    internal class XML_ConfigProvider : Base_ConfigProvider
+    {
+        internal XML_ConfigProvider()
+        {
+            _WriteOptions = new FileStreamOptions
+            {
+                Mode = FileMode.Truncate,
+                Access = FileAccess.Write,
+                Share = FileShare.ReadWrite,
+                Options = FileOptions.None
+            };
+
+            _ReadOptions = new FileStreamOptions
+            {
+                Mode = FileMode.OpenOrCreate,
+                Access = FileAccess.Read,
+                Share = FileShare.ReadWrite,
+                Options = FileOptions.None
+            };
         }
 
         #region Konstanten für Config Pfad und Inhalt
 
-        private FileStreamOptions _WriteOptions = new FileStreamOptions();
-        private FileStreamOptions _ReadOptions = new FileStreamOptions();
+        private FileStreamOptions _WriteOptions;
+        private FileStreamOptions _ReadOptions;
 
         private const string _ConfigPath = "./Config.xml";
+
         private const string _ElementName_Preset = "Preset";
-        private const string _AttributeName_DisplayName = "DisplayName";
+        private const string _AttributeName_PresetName = "PresetName";
         private const string _AttributeName_DestinationPath = "DestinationPath";
 
         private const string _ElementName_SourcePath = "SourcePath";
 
         #endregion Konstanten für Config Pfad und Inhalt
 
-        public void SaveConfig(List<Preset> presetsToSave)
+        internal override Result SaveConfig(List<Preset> presetsToSave)
         {
             var rootElement = new XElement(XName.Get("root"));
 
             foreach (var preset in presetsToSave)
             {
                 var xmlPreset = new XElement(XName.Get(_ElementName_Preset));
-                xmlPreset.Add(new XAttribute(XName.Get(_AttributeName_DisplayName), preset.DisplayName));
+                xmlPreset.Add(new XAttribute(XName.Get(_AttributeName_PresetName), preset.PresetName));
                 xmlPreset.Add(new XAttribute(XName.Get(_AttributeName_DestinationPath), preset.DestiantionPath));
 
                 foreach (var sourcePath in preset.SourceFiles)
@@ -56,9 +66,11 @@ namespace TheMover.Model
             {
                 resultDocument.Save(configWriter);
             }
+
+            return Result.Ok();
         }
 
-        public List<Preset> ReadConfig()
+        internal override Result<List<Preset>> ReadConfig()
         {
             if (!File.Exists(_ConfigPath))
             {
@@ -81,7 +93,7 @@ namespace TheMover.Model
 
                 string displayName;
                 {
-                    var presetNameElement = presetsFromConfig[i].Attribute(XName.Get(_AttributeName_DisplayName));
+                    var presetNameElement = presetsFromConfig[i].Attribute(XName.Get(_AttributeName_PresetName));
                     if (null != presetNameElement)
                         displayName = presetNameElement.Value;
                     else displayName = "Unnamed Preset";
@@ -124,8 +136,6 @@ namespace TheMover.Model
                     }
                 }
 
-                // #Todo - A validity Check could be done here
-
                 if (!error)
                 {
                     result.Add(new Preset(displayName, sourceFiles, destinationPath));
@@ -144,9 +154,32 @@ namespace TheMover.Model
                 string backupFileFullName = string.Concat(backupDirectoryInfo.FullName, "/", backupFileName);
 
                 File.Copy(_ConfigPath, backupFileFullName);
-                MessageBox.Show($"{errorCount} errors detected while reading the config.\r\nBackup file of faulty config created under: {backupFileFullName}\r\nFaulty conig elements will be removed automatically");
+                Console.WriteLine($"{errorCount} errors detected while reading the config.\r\nBackup file of faulty config created under: {backupFileFullName}\r\nFaulty conig elements will be removed automatically");
             }
             return result;
         }
+
+        #region Custom Exceptions
+
+        internal class ConfigReadingException : Exception
+        {
+
+            public ConfigReadingException()
+            {
+            }
+
+            public ConfigReadingException(string message)
+                : base(message)
+            {
+            }
+
+            public ConfigReadingException(string message, Exception inner)
+                : base(message, inner)
+            {
+            }
+        }
+
+        #endregion Custom Exceptions
+
     }
 }
