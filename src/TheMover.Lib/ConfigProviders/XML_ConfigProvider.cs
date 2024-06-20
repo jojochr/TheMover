@@ -2,59 +2,44 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml.Linq;
 
 using TheMover.Primitives;
 
-namespace TheMover.ConfigProviders
-{
-    internal class XML_ConfigProvider : Base_ConfigProvider
-    {
-        internal XML_ConfigProvider()
-        {
-            _WriteOptions = new FileStreamOptions
-            {
-                Mode = FileMode.Truncate,
-                Access = FileAccess.Write,
-                Share = FileShare.ReadWrite,
-                Options = FileOptions.None
-            };
+namespace TheMover.ConfigProviders {
+    internal class XML_ConfigProvider : Base_ConfigProvider {
+        #region For Config-File reading
+        private const string CONFIG_PATH = "./config.xml";
+        private const string BACKUP_PATH = "./backup";
 
-            _ReadOptions = new FileStreamOptions
-            {
-                Mode = FileMode.OpenOrCreate,
-                Access = FileAccess.Read,
-                Share = FileShare.ReadWrite,
-                Options = FileOptions.None
-            };
+        private StreamReader GetFileReader() {
+            return new StreamReader(path: CONFIG_PATH, encoding: Encoding.UTF8);
         }
 
-        #region Konstanten für Config Pfad und Inhalt
+        private StreamWriter GetFileWriter() {
+            // Deletes the existing file, create if the file does not exist and write UTF8
+            return new StreamWriter(path: CONFIG_PATH, append: false, encoding: Encoding.UTF8);
+        }
 
-        private FileStreamOptions _WriteOptions;
-        private FileStreamOptions _ReadOptions;
-
-        private const string _Config_Path = "./Config.xml";
         private const string _ElementName_Preset = "Preset";
         private const string _AttributeName_PresetName = "PresetName";
         private const string _AttributeName_DestinationPath = "DestinationPath";
 
         private const string _ElementName_SourcePath = "SourcePath";
 
-        #endregion Konstanten für Config Pfad und Inhalt
+        #endregion For Config-File reading
 
-        internal override Option<ConfigWritingException> SaveConfig(List<Preset> presetsToSave)
-        {
+
+        internal override Option<ConfigWritingException> SaveConfig(List<Preset> presetsToSave) {
             var rootElement = new XElement(XName.Get("root"));
 
-            foreach (var preset in presetsToSave)
-            {
+            foreach(var preset in presetsToSave) {
                 var xmlPreset = new XElement(XName.Get(_ElementName_Preset));
                 xmlPreset.Add(new XAttribute(XName.Get(_AttributeName_PresetName), preset.PresetName));
                 xmlPreset.Add(new XAttribute(XName.Get(_AttributeName_DestinationPath), preset.DestiantionPath));
 
-                foreach (var sourcePath in preset.SourceFiles)
-                {
+                foreach(var sourcePath in preset.SourceFiles) {
                     xmlPreset.Add(new XElement(XName.Get(_ElementName_SourcePath), sourcePath));
                 }
 
@@ -64,101 +49,112 @@ namespace TheMover.ConfigProviders
             var resultDocument = new XDocument();
             resultDocument.Add(rootElement);
 
-            using (var configWriter = new StreamWriter(_ConfigPath, _WriteOptions))
-            {
+            using(var configWriter = GetFileWriter()) {
                 resultDocument.Save(configWriter);
             }
 
             return Option<ConfigWritingException>.None;
         }
 
-        internal override Result<List<Preset>, ConfigReadingException> ReadConfig()
-        {
-            if (!File.Exists(_ConfigPath))
-            {
+        internal override Result<List<Preset>, ConfigReadingException> ReadConfig() {
+            if(!File.Exists(CONFIG_PATH)) {
                 return new List<Preset>();
             }
 
-            // #Todo JCI - Configvalidation should happen here
-
             XElement[] presetsFromConfig;
-            using (var configReader = new FileStream(_ConfigPath, _ReadOptions))
-            {
+            using(var configReader = GetFileReader()) {
                 presetsFromConfig = XDocument.Load(configReader).Descendants(XName.Get(_ElementName_Preset)).ToArray();
             }
 
+            var result = ValidatePresets(presetsFromConfig);
+
+            // Create a backup before returning
+            BackupOldPresetFile();
+
+            return result;
+        }
+
+        /// <summary>
+        /// Runs a few checks and deletes every <seealso cref="Preset"/> that does not pass
+        /// </summary>
+        /// <returns>A list of validated Presets</returns>
+        public List<Preset> ValidatePresets(XElement[] presetsToValidate) {
             var result = new List<Preset>();
-            int errorCount = 0;
-            for (int i = 0; i < presetsFromConfig.Length; i++)
-            {
+
+            foreach(var presetXElement in presetsToValidate) {
                 bool error = false;
 
-                string displayName;
-                {
-                    var presetNameElement = presetsFromConfig[i].Attribute(XName.Get(_AttributeName_PresetName));
-                    if (null != presetNameElement)
-                        displayName = presetNameElement.Value;
-                    else displayName = "Unnamed Preset";
+                if(!ParseAndValidate_PresetName_FromXMLElement(presetXElement).IsSome(out var displayName)) {
+                    displayName = "Unnamed Preset";
                 }
 
-                string destinationPath;
-                {
-                    var destinationElement = presetsFromConfig[i].Attribute(XName.Get(_AttributeName_DestinationPath));
-                    if (null != destinationElement)
-                        destinationPath = destinationElement.Value;
-                    else
-                    {
-                        destinationPath = "";
-                        error = true;
-                    }
+                if(!ParseAndValidate_DestinationPath_FromXMLElement(presetXElement).IsSome(out var destinationPath)) {
+                    destinationPath = "";
+                    error = true;
                 }
 
-                var sourceFiles = new List<string>();
-                {
-                    foreach (var sourceFileElement in presetsFromConfig[i].Descendants(XName.Get(_ElementName_SourcePath)))
-                    {
-                        if (null == sourceFileElement)
-                        {
-                            continue;
-                        }
-
-                        string sourcePath = sourceFileElement.Value;
-                        if (sourcePath == string.Empty)
-                        {
-                            continue;
-                        }
-
-                        sourceFiles.Add(sourcePath);
-
-                    }
-
-                    if (sourceFiles.Count < 1)
-                    {
-                        error = true;
-                    }
+                if(!ParseAndValidate_SourceFiles_FromXMLElement(presetXElement).IsSome(out var sourceFiles)) {
+                    sourceFiles = new List<string>();
+                    error = true;
                 }
 
-                if (!error)
-                {
+                // Only add the presets if no fatal errors occur.
+                if(!error) {
                     result.Add(new Preset(displayName, sourceFiles, destinationPath));
                 }
-                else
-                {
-                    errorCount++;
-                }
             }
 
-            if (errorCount > 0)
-            {
-                string backupFileName = "FaultyConfig" + DateTime.Now.ToString("-yyyy-MM-dd_HH-mm-ss") + ".xml";
-                var backupDirectoryInfo = Directory.CreateDirectory("./Backup");
-
-                string backupFileFullName = string.Concat(backupDirectoryInfo.FullName, "/", backupFileName);
-
-                File.Copy(_ConfigPath, backupFileFullName);
-                Console.WriteLine($"{errorCount} errors detected while reading the config.\r\nBackup file of faulty config created under: {backupFileFullName}\r\nFaulty conig elements will be removed automatically");
-            }
             return result;
+        }
+
+        #region XML Validation
+        private Option<string> ParseAndValidate_PresetName_FromXMLElement(XElement xmlElement) {
+            var presetNameAttribute = xmlElement.Attribute(XName.Get(_AttributeName_PresetName));
+
+            return presetNameAttribute?.Value ?? Option<string>.None;
+        }
+        private Option<string> ParseAndValidate_DestinationPath_FromXMLElement(XElement xmlElement) {
+            var destinationAttribute = xmlElement.Attribute(XName.Get(_AttributeName_DestinationPath));
+
+            return destinationAttribute?.Value ?? Option<string>.None;
+        }
+        private Option<List<string>> ParseAndValidate_SourceFiles_FromXMLElement(XElement xmlElement) {
+            var sourcePaths = new List<string>();
+
+            foreach(var sourceFileElement in xmlElement.Descendants(XName.Get(_ElementName_SourcePath))) {
+                if(null == sourceFileElement) {
+                    continue;
+                }
+
+                string sourcePath = sourceFileElement.Value;
+                if(sourcePath == string.Empty) {
+                    continue;
+                }
+
+                sourcePaths.Add(sourcePath);
+            }
+
+            if(sourcePaths.Count < 1) {
+                return Option<List<string>>.None;
+            }
+
+            return sourcePaths;
+        }
+        #endregion XML Validation
+
+        /// <summary>
+        /// Can be used to create a backup of the Configurationfile<br></br>
+        /// Throws an Exception if a Backup is not possible for whateverreason<br></br>
+        /// -> I dont like, that i throw here. I will find a structural solution soon.
+        /// </summary>
+        /// <exception cref="Exception"></exception>
+        private void BackupOldPresetFile() {
+            string backupFileName = "FaultyConfig" + DateTime.Now.ToString("-yyyy-MM-dd_HH-mm-ss") + ".xml";
+            var backupDirectoryInfo = Directory.CreateDirectory(BACKUP_PATH);
+
+            string backupFileFullName = string.Concat(backupDirectoryInfo.FullName, "/", backupFileName);
+
+            File.Copy(CONFIG_PATH, backupFileFullName);
         }
     }
 }
