@@ -6,8 +6,12 @@ using System.Runtime.InteropServices;
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
 // die einer Assembly zugeordnet sind.
 [assembly: AssemblyTitle("TheMover.Lib")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyDescription("This is a Library for TheMover, used by the CLI and the WPF Application")]
+#if DEBUG
+[assembly: AssemblyConfiguration("Debug")]
+#else // In this project, every non-Debug-build is a release
+[assembly: AssemblyConfiguration("Release")]
+#endif
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("TheMover.Lib")]
 [assembly: AssemblyCopyright("Copyright ©  2024")]
