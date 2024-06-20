@@ -34,6 +34,7 @@ namespace TheMover.ConfigReaders
         private FileStreamOptions _WriteOptions;
         private FileStreamOptions _ReadOptions;
 
+        private const string _Config_Path = "./Config.xml";
         private const string _ElementName_Preset = "Preset";
         private const string _AttributeName_PresetName = "PresetName";
         private const string _AttributeName_DestinationPath = "DestinationPath";

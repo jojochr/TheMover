@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using TheMover.Datastructures;
 
 internal abstract class Base_ConfigProvider {
-    private const string CONFIG_PATH = "./Config.xml";
-
     /// <summary>
     /// When implemented this should read a configuration
     /// </summary>
