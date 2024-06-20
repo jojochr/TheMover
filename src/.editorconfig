@@ -82,14 +82,14 @@ csharp_style_var_for_built_in_types = false
 csharp_style_var_when_type_is_apparent = true
 
 # Ausdruckskörpermember
-csharp_style_expression_bodied_accessors = when_on_single_line:silent
-csharp_style_expression_bodied_constructors = when_on_single_line:silent
-csharp_style_expression_bodied_indexers = when_on_single_line:silent
-csharp_style_expression_bodied_lambdas = when_on_single_line:silent
-csharp_style_expression_bodied_local_functions = when_on_single_line:silent
-csharp_style_expression_bodied_methods = when_on_single_line:silent
-csharp_style_expression_bodied_operators = when_on_single_line:silent
-csharp_style_expression_bodied_properties = when_on_single_line:silent
+csharp_style_expression_bodied_accessors = when_on_single_line
+csharp_style_expression_bodied_constructors = when_on_single_line
+csharp_style_expression_bodied_indexers = when_on_single_line
+csharp_style_expression_bodied_lambdas = when_on_single_line
+csharp_style_expression_bodied_local_functions = when_on_single_line
+csharp_style_expression_bodied_methods = when_on_single_line
+csharp_style_expression_bodied_operators = when_on_single_line
+csharp_style_expression_bodied_properties = when_on_single_line
 
 # Einstellungen für den Musterabgleich
 csharp_style_pattern_matching_over_as_with_null_check = true
@@ -117,18 +117,18 @@ csharp_style_prefer_primary_constructors = true
 csharp_style_prefer_top_level_statements = true
 
 # Einstellungen für Ausdrucksebene
-csharp_prefer_simple_default_expression = true:suggestion
-csharp_style_deconstructed_variable_declaration = true:suggestion
-csharp_style_implicit_object_creation_when_type_is_apparent = true:suggestion
-csharp_style_inlined_variable_declaration = true:suggestion
-csharp_style_prefer_index_operator = true:suggestion
-csharp_style_prefer_local_over_anonymous_function = true:suggestion
-csharp_style_prefer_null_check_over_type_check = true:suggestion
-csharp_style_prefer_range_operator = true:suggestion
-csharp_style_prefer_tuple_swap = true:suggestion
-csharp_style_prefer_utf8_string_literals = true:suggestion
-csharp_style_throw_expression = true:suggestion
-csharp_style_unused_value_assignment_preference = discard_variable:suggestion
+csharp_prefer_simple_default_expression = true
+csharp_style_deconstructed_variable_declaration = true
+csharp_style_implicit_object_creation_when_type_is_apparent = true
+csharp_style_inlined_variable_declaration = true
+csharp_style_prefer_index_operator = true
+csharp_style_prefer_local_over_anonymous_function = true
+csharp_style_prefer_null_check_over_type_check = true
+csharp_style_prefer_range_operator = true
+csharp_style_prefer_tuple_swap = true
+csharp_style_prefer_utf8_string_literals = true
+csharp_style_throw_expression = true
+csharp_style_unused_value_assignment_preference = discard_variable
 csharp_style_unused_value_expression_statement_preference = discard_variable
 
 # Einstellungen für using-Anweisungen
@@ -168,7 +168,7 @@ csharp_space_after_dot = false
 csharp_space_after_keywords_in_control_flow_statements = false
 csharp_space_after_semicolon_in_for_statement = true
 csharp_space_around_binary_operators = before_and_after
-csharp_space_around_declaration_statements = ignore
+csharp_space_around_declaration_statements = false
 csharp_space_before_colon_in_inheritance_clause = true
 csharp_space_before_comma = false
 csharp_space_before_dot = false
@@ -191,6 +191,10 @@ csharp_preserve_single_line_statements = false
 #### Benennungsstile ####
 
 # Benennungsregeln
+
+dotnet_naming_rule.constants_should_be_all_uppercase.severity = suggestion
+dotnet_naming_rule.constants_should_be_all_uppercase.symbols = constants
+dotnet_naming_rule.constants_should_be_all_uppercase.style = all_uppercase
 
 dotnet_naming_rule.interface_should_be_begins_with_i.severity = suggestion
 dotnet_naming_rule.interface_should_be_begins_with_i.symbols = interface
@@ -234,6 +238,10 @@ dotnet_naming_symbols.private_members.applicable_kinds = property, field
 dotnet_naming_symbols.private_members.applicable_accessibilities = private
 dotnet_naming_symbols.private_members.required_modifiers = 
 
+dotnet_naming_symbols.constants.applicable_kinds = *
+dotnet_naming_symbols.constants.applicable_accessibilities = *
+dotnet_naming_symbols.constants.required_modifiers = const
+
 # Benennungsstile
 
 dotnet_naming_style.pascal_case.required_prefix = 
@@ -256,22 +264,7 @@ dotnet_naming_style.starts_with_m_.required_suffix =
 dotnet_naming_style.starts_with_m_.word_separator = 
 dotnet_naming_style.starts_with_m_.capitalization = pascal_case
 
-[*.{cs,vb}]
-dotnet_style_coalesce_expression = true:suggestion
-dotnet_style_null_propagation = true:suggestion
-dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
-dotnet_style_prefer_auto_properties = true:silent
-dotnet_style_object_initializer = true:suggestion
-dotnet_style_collection_initializer = true:suggestion
-dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
-dotnet_style_prefer_conditional_expression_over_assignment = true:silent
-dotnet_style_prefer_conditional_expression_over_return = true:silent
-dotnet_style_explicit_tuple_names = true:suggestion
-dotnet_style_prefer_inferred_tuple_names = true:suggestion
-dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion
-dotnet_style_prefer_compound_assignment = true:suggestion
-dotnet_style_prefer_simplified_interpolation = true:suggestion
-dotnet_style_prefer_collection_expression = when_types_loosely_match:suggestion
-dotnet_style_namespace_match_folder = true:suggestion
-dotnet_style_operator_placement_when_wrapping = beginning_of_line
-end_of_line = crlf
+dotnet_naming_style.all_uppercase.required_prefix = 
+dotnet_naming_style.all_uppercase.required_suffix = 
+dotnet_naming_style.all_uppercase.word_separator = 
+dotnet_naming_style.all_uppercase.capitalization = all_upper
