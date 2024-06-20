@@ -1,8 +1,6 @@
-﻿namespace TheMover.Datastructures {
-    /// <summary>
-    /// This implementation is very basic and only meant for light weight use and starting off with the Result type.<br></br>
-    /// Please either look for a Result-implementation with more Features like Fluent.Results if needed or, if you really want to, extend this type.
-    /// </summary>
+﻿using System;
+
+namespace TheMover.Datastructures {
     public readonly struct Result<T, E> {
         private readonly bool _success;
         public readonly T Value;
@@ -17,15 +15,15 @@
         public bool IsOk => _success;
 
         public static Result<T, E> Ok(T v) {
-            return new(v, default(E), true);
+            return new Result<T, E>(v, default(E), true);
         }
 
         public static Result<T, E> Err(E e) {
-            return new(default(T), e, false);
+            return new Result<T, E>(default(T), e, false);
         }
 
-        public static implicit operator Result<T, E>(T v) => new(v, default(E), true);
-        public static implicit operator Result<T, E>(E e) => new(default(T), e, false);
+        public static implicit operator Result<T, E>(T v) => new Result<T, E>(v, default(E), true);
+        public static implicit operator Result<T, E>(E e) => new Result<T, E>(default(T), e, false);
 
         public R Match<R>(
                 Func<T, R> success,

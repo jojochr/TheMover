@@ -2,7 +2,7 @@
     public struct Option<T> {
         private Option(T value) {
             this.value = value;
-            isSome = this.value is { };
+            isSome = true;
         }
 
         private readonly bool isSome;
