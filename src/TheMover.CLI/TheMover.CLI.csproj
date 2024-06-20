@@ -43,8 +43,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandLineOptions\MajorOption.cs" />
+    <Compile Include="CommandLineOptions\MinorOption.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TheMover.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
