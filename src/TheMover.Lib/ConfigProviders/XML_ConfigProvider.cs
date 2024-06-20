@@ -1,4 +1,8 @@
-﻿using System.Xml.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Xml.Linq;
 
 using TheMover.Datastructures;
 
@@ -29,8 +33,6 @@ namespace TheMover.ConfigReaders
 
         private FileStreamOptions _WriteOptions;
         private FileStreamOptions _ReadOptions;
-
-        private const string _ConfigPath = "./Config.xml";
 
         private const string _ElementName_Preset = "Preset";
         private const string _AttributeName_PresetName = "PresetName";
@@ -157,31 +159,5 @@ namespace TheMover.ConfigReaders
             }
             return result;
         }
-
-        #region Custom Exceptions
-        internal class ConfigReadingException : Exception {
-            public ConfigReadingException() {
-            }
-
-            public ConfigReadingException(string message)
-                : base(message) {
-            }
-
-            public ConfigReadingException(string message, Exception inner)
-                : base(message, inner) {
-            }
-        }
-        internal class ConfigWritingException : Exception {
-            public ConfigWritingException() {
-            }
-            public ConfigWritingException(string message)
-                : base(message) {
-            }
-            public ConfigWritingException(string message, Exception inner)
-                : base(message, inner) {
-            }
-        }
-        #endregion Custom Exceptions
-
     }
 }
