@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheMover.Datastructures {
+namespace TheMover.Primitives {
     public readonly struct Result<T, E> {
         private readonly bool _success;
         public readonly T Value;

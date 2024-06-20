@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
-using TheMover.Datastructures;
+using TheMover.Primitives;
 
-namespace TheMover.ConfigReaders
+namespace TheMover.ConfigProviders
 {
     internal class XML_ConfigProvider : Base_ConfigProvider
     {

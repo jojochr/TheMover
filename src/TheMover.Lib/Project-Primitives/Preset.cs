@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace TheMover.Datastructures {
+namespace TheMover.Primitives{
     internal struct Preset {
         internal Preset(string presetName, List<string> sourceFiles, string destnationPath) {
             PresetName = presetName;

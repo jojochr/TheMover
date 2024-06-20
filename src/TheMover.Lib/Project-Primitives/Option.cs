@@ -1,4 +1,4 @@
-﻿namespace TheMover.Datastructures {
+﻿namespace TheMover.Primitives {
     public struct Option<T> {
         private Option(T value) {
             this.value = value;
