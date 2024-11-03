@@ -1,0 +1,59 @@
+<UserControl x:Class="TheMover.UI.Controls.PackageDetailView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TheMover.UI.Controls"
+             xmlns:design="clr-namespace:TheMover.UI.ViewModel.Design"
+             mc:Ignorable="d design"
+             d:DesignHeight="450" d:DesignWidth="800" Background="White"
+             d:DataContext="{d:DesignInstance design:DesignPackagesListViewModel, IsDesignTimeCreatable=True}">
+    <!--<TextBox>
+        <TextBox.Style>
+            <Style TargetType="{x:Type TextBox}"  BasedOn="{StaticResource ReadOnlyTextBox}">
+                <Setter Property="Text" Value="{Binding Name}"/>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Path=Name.Length, FallbackValue=0, TargetNullValue=0}" Value="0">
+                        <Setter Property="Text" Value="{x:Static local:ApplicationLabels.NoValueMessage}"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </TextBox.Style>
+    </TextBox>-->
+
+    <StackPanel DataContext="{Binding SelectedPackage}">
+        <StackPanel Orientation="Horizontal">
+            <StackPanel.Resources>
+                <Style x:Key="PackageNameLabelStyle" TargetType="{x:Type Label}">
+                    <Setter Property="Content" Value="{Binding PackageName, Mode=OneWay}"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding PackageName, FallbackValue=0, TargetNullValue=0}" Value="0">
+                            <Setter Property="Content" Value="No Package selected"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Resources>
+
+            <Label Style="{StaticResource PackageNameLabelStyle}" Background="Aquamarine"/>
+            <StackPanel Orientation="Horizontal" Background="LightBlue">
+                <Label Content="Path:"/>
+                <Label Content="{Binding PackagePath}"/>
+            </StackPanel>
+
+        </StackPanel>
+        <ListView ItemsSource="{Binding ContainedFiles}" IsHitTestVisible="False" IsManipulationEnabled="False" IsTextSearchEnabled="False">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="{Binding Icon}" d:Source="/TheMover.UI;component/Ressources/MissingFileIcon.ico"/>
+                        <Rectangle Width="5" Fill="Transparent"/>
+                        <TextBlock Text="{Binding PackageRelativePath}"/>
+                    </StackPanel>
+
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+    </StackPanel>
+</UserControl>
