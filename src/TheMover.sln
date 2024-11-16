@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheMover.Infrastructure", "
 		{5A2FEBAC-A58F-4F4D-809C-05B4A479E421} = {5A2FEBAC-A58F-4F4D-809C-05B4A479E421}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheMover.UI", "TheMover.UI\TheMover.UI.csproj", "{64ED05EF-F623-47D6-9B0C-2861EEE5FFC2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{3CE76BC7-EFFA-42D9-8D61-C5D4EA3BCBB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3CE76BC7-EFFA-42D9-8D61-C5D4EA3BCBB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3CE76BC7-EFFA-42D9-8D61-C5D4EA3BCBB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64ED05EF-F623-47D6-9B0C-2861EEE5FFC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64ED05EF-F623-47D6-9B0C-2861EEE5FFC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64ED05EF-F623-47D6-9B0C-2861EEE5FFC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64ED05EF-F623-47D6-9B0C-2861EEE5FFC2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
