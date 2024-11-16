@@ -1,7 +1,19 @@
-﻿namespace TheMover.UI.ViewModels;
+﻿using System;
+using System.Threading.Tasks;
+using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
+
+namespace TheMover.UI.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase {
-#pragma warning disable CA1822 // Mark members as static
-    public string Greeting => "Welcome to Avalonia!";
-#pragma warning restore CA1822 // Mark members as static
+    public MainWindowViewModel() {
+        Greeting = "Welcome to Avalonia!";
+        Task.Run(async () => {
+                     await Task.Delay(TimeSpan.FromSeconds(3));
+                     Dispatcher.UIThread.Post(() => Greeting = $"Hello from Async-Task!");
+                 });
+    }
+
+    [ObservableProperty]
+    private string _Greeting;
 }
