@@ -1,6 +1,6 @@
-using TheMover.UI.Model;
+using TheMover.WPF.UI.Model;
 
-namespace TheMover.UI.ViewModel.Design {
+namespace TheMover.WPF.UI.ViewModel.Design {
     public class DesignPackagesListViewModel : PackagesListViewModel {
         public DesignPackagesListViewModel() {
             MovablePackages = new(GetDummyPackages(5,6));

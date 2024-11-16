@@ -1,10 +1,10 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using TheMover.Infrastructure.Provider;
-using TheMover.UI.Helper;
-using TheMover.UI.Provider;
+using TheMover.WPF.UI.Helper;
+using TheMover.WPF.UI.Provider;
 
-namespace TheMover.UI.Model {
+namespace TheMover.WPF.UI.Model {
     public class MovablePackage : OnPropertyChangedImplementer {
         #region ctor
         public MovablePackage(string packageName, string packagePathRelativeToRepo, IEnumerable<PackageContainedFile> files) {

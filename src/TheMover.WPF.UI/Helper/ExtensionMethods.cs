@@ -5,7 +5,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows;
 
-namespace TheMover.UI.Helper {
+namespace TheMover.WPF.UI.Helper {
     internal static class ExtensionMethods {
 
         [DllImport("gdi32.dll", SetLastError = true)]

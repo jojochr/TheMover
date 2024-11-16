@@ -1,7 +1,7 @@
 using System.Windows.Media;
-using TheMover.UI.Helper;
+using TheMover.WPF.UI.Helper;
 
-namespace TheMover.UI.Model {
+namespace TheMover.WPF.UI.Model {
     public class PackageContainedFile(Icon icon, string packageRelativePath) : OnPropertyChangedImplementer {
         private Icon _Icon = icon;
         public ImageSource Icon {

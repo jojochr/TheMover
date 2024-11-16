@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace TheMover.UI {
+namespace TheMover.WPF.UI {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>

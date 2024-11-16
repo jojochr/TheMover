@@ -1,10 +1,10 @@
 using System.Collections.ObjectModel;
 using BaseMovablePackage = TheMover.Domain.Model.MovablePackage;
-using TheMover.UI.Helper;
 using TheMover.Infrastructure.Provider;
-using TheMover.UI.Model;
+using TheMover.WPF.UI.Helper;
+using TheMover.WPF.UI.Model;
 
-namespace TheMover.UI.ViewModel {
+namespace TheMover.WPF.UI.ViewModel {
     public class PackagesListViewModel : OnPropertyChangedImplementer {
         #region ctor
         public PackagesListViewModel() {

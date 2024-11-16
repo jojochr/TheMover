@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Windows;
 using MessageBox = System.Windows.MessageBox;
 
-namespace TheMover.UI.Provider {
+namespace TheMover.WPF.UI.Provider {
     internal static class FileIconProvider {
         internal static readonly Icon MissingFileIcon = GetMissingFileIconFromAssembly();
 

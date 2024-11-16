@@ -14,7 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using UserControl = System.Windows.Controls.UserControl;
 
-namespace TheMover.UI.Controls {
+namespace TheMover.WPF.UI.Controls {
     /// <summary>
     /// Interaction logic for PackagesListView.xaml
     /// </summary>

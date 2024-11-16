@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace TheMover.UI.Provider {
+namespace TheMover.WPF.UI.Provider {
     public static class KnownFolderProvider {
         public enum KnownFolder {
             Contacts,

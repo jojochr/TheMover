@@ -2,12 +2,12 @@ using System.IO;
 using System.Windows;
 using TheMover.Infrastructure.Provider;
 using TheMover.Infrastructure.Services;
-using TheMover.UI.Helper;
-using TheMover.UI.Model;
-using TheMover.UI.Provider;
+using TheMover.WPF.UI.Helper;
+using TheMover.WPF.UI.Model;
+using TheMover.WPF.UI.Provider;
 using MessageBox = System.Windows.MessageBox;
 
-namespace TheMover.UI.ViewModel {
+namespace TheMover.WPF.UI.ViewModel {
     public class MainWindowViewModel {
 
         #region ctor
