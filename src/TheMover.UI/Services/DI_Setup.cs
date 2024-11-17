@@ -9,6 +9,8 @@ namespace TheMover.UI.Services {
         public static ServiceProvider GetServiceProvider() {
             ServiceCollection services = [];
             services.AddScoped<MainWindowViewModel>();
+            services.AddSingleton<FileIconService>();
+            services.AddSingleton<FrontendMovablePackageBuilder>();
 
             return services.BuildServiceProvider();
         }
