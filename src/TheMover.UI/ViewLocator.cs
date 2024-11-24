@@ -11,7 +11,7 @@ public class ViewLocator : IDataTemplate {
             return null;
         }
 
-        string name = data.GetType().FullName!.Replace(oldValue: "ViewModel", newValue: "View", StringComparison.Ordinal);
+        string name = data.GetType().FullName!.Replace(oldValue: "ViewModel", newValue: "View", StringComparison.InvariantCulture);
         var type = Type.GetType(name);
 
         if(type is null) {
@@ -23,7 +23,5 @@ public class ViewLocator : IDataTemplate {
         return control;
     }
 
-    public bool Match(object? data) {
-        return data is ViewModelBase;
-    }
+    public bool Match(object? data) => data is ViewModelBase;
 }

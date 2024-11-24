@@ -1,0 +1,67 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:TheMover.UI.ViewModels"
+             xmlns:controls="clr-namespace:TheMover.UI.Views.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:design="clr-namespace:TheMover.UI.ViewModels.Design"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TheMover.UI.Views.PackageOperationsPage"
+             x:DataType="vm:PackageOperationsViewModel">
+    <Design.DataContext>
+        <design:DesignPackageOperationsViewModel></design:DesignPackageOperationsViewModel>
+    </Design.DataContext>
+
+    <UserControl.Styles>
+        <Style Selector="TextBlock.ListedPackagesStyle">
+            <Setter Property="Background" Value="LightBlue" />
+            <Setter Property="FontSize" Value="{DynamicResource FontSizeLarge}" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+        </Style>
+        <Style Selector="Button.PackageCommandButton">
+            <Setter Property="Margin" Value="0 10 0 10" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" /> <!--PackageList column-->
+            <ColumnDefinition Width="*" /> <!--PackageDetails column-->
+            <ColumnDefinition Width="Auto" /> <!--Button column-->
+        </Grid.ColumnDefinitions>
+
+        <ListBox Grid.Column="0" ItemsSource="{Binding MovablePackages }" Selection="{Binding SelectedPackage}" SelectionMode="Single">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Classes="ListedPackagesStyle" Text="{Binding PackageName}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <Border Grid.Column="1" BorderThickness="2" Padding="2" Margin="2" BorderBrush="Blue">
+            <controls:PackageDetailsControl />
+        </Border>
+
+        <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="0 0 20 0">
+            <Button Classes="PackageCommandButton" Content="Move Package to..."
+                    Command="{Binding MovePackageToDirectoryXCommand}" CommandParameter="{Binding SelectedPackage}" />
+
+            <Button Classes="PackageCommandButton" Content="Refresh"
+                    Command="{Binding RefreshCommand}" />
+
+            <Button Classes="PackageCommandButton" Content="Edit Package"
+                    Command="{Binding EditPackageCommand}" CommandParameter="{Binding SelectedPackage}" />
+
+            <Button Classes="PackageCommandButton" Content="Remove Package"
+                    Command="{Binding RemovePackageCommand}" CommandParameter="{Binding SelectedPackage}" />
+
+            <Button Classes="PackageCommandButton" Content="Export Package to..."
+                    Command="{Binding ExportPackageAsZipCommand}" CommandParameter="{Binding SelectedPackage}" />
+
+            <Button Classes="PackageCommandButton" Content="Import Package from..."
+                    Command="{Binding ImportPackageCommand}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

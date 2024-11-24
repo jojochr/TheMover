@@ -1,0 +1,45 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:TheMover.UI.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:design="clr-namespace:TheMover.UI.ViewModels.Design"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="TheMover.UI.Views.Controls.PackageDetailsControl"
+             x:DataType="vm:PackageOperationsViewModel">
+    <Design.DataContext>
+        <design:DesignPackageOperationsViewModel></design:DesignPackageOperationsViewModel>
+    </Design.DataContext>
+
+    <UserControl.Styles>
+        <Style Selector="TextBlock.header_text-block">
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="FontSize" Value="{DynamicResource FontSizeNormal}" />
+        </Style>
+    </UserControl.Styles>
+
+    <StackPanel DataContext="{Binding SelectedPackage}">
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Classes="header_text-block" Background="Aquamarine"
+                       Text="{Binding PackageName, FallbackValue='No Package selected', TargetNullValue='No Package selected', Mode=OneWay}" />
+            <StackPanel Orientation="Horizontal" Background="LightBlue">
+                <TextBlock Classes="header_text-block" Text="Path:" />
+                <TextBlock Classes="header_text-block"
+                           Text="{Binding PackagePath, Mode=OneWay}" />
+            </StackPanel>
+        </StackPanel>
+
+        <ItemsControl ItemsSource="{Binding ContainedFiles}" IsHitTestVisible="False">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="{Binding Icon, Mode=OneWay}" Margin=" 0,0,5,0" />
+                        <TextBlock Text="{Binding PackageRelativePath, Mode=OneWay}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+</UserControl>

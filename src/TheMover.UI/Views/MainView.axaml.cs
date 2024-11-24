@@ -3,9 +3,8 @@ using TheMover.UI.ViewModels;
 
 namespace TheMover.UI.Views;
 
-public partial class MainWindow : Window {
-    public MainWindow() {
+public partial class MainView : Window {
+    public MainView() {
         InitializeComponent();
-        DataContext = new MainWindowViewModel();
     }
 }

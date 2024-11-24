@@ -1,19 +1,16 @@
-﻿using System;
-using System.Threading.Tasks;
-using Avalonia.Threading;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace TheMover.UI.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase {
-    public MainWindowViewModel() {
-        Greeting = "Welcome to Avalonia!";
-        Task.Run(async () => {
-                     await Task.Delay(TimeSpan.FromSeconds(3));
-                     Dispatcher.UIThread.Post(() => Greeting = $"Hello from Async-Task!");
-                 });
-    }
+#pragma warning disable CS8618, CS9264
+    /// <summary>This is just used for DesignData, and it initializes everything with null.</summary>
+    public MainWindowViewModel() { }
+#pragma warning restore CS8618, CS9264
 
+    public MainWindowViewModel(PackageOperationsViewModel operationsViewModel) {
+        _PackageOperationsViewModel = operationsViewModel;
+    }
     [ObservableProperty]
-    private string _Greeting;
+    private PackageOperationsViewModel _PackageOperationsViewModel;
 }
