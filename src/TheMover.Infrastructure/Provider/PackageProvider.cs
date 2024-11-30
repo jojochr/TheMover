@@ -6,52 +6,37 @@ using TheMover.Domain.Model.Primitives;
 using TheMover.Infrastructure.Services;
 
 namespace TheMover.Infrastructure.Provider {
+    /// <summary>
+    /// This contains the Logic to do all the Package-Operations needed.<br/>
+    /// This Class is meant to be used as a Singleton. It however does not provide a "GetInstance"-Method so please use your Dependency-Injection-Framework of choice.
+    /// </summary>
     public class PackageProvider {
-        #region Constants
-        private static readonly TimeSpan FileSystemTimeout = TimeSpan.FromSeconds(10);
-        private static readonly string DefaultPackagePath = Path.Combine(Directory.GetCurrentDirectory(), "packages");
-        public readonly DirectoryInfo PackageDirectory;
-        #endregion Constants
 
         #region ctor
-        private PackageProvider() {
-            PackageDirectory = Directory.CreateDirectory(DefaultPackagePath);
-            _Logger = Logger.GetInstance();
+        private PackageProvider(Logger logger) {
+            _Logger = logger;
         }
 
-        private static PackageProvider? _Instance;
-
-        /// <summary>
-        /// Gets the Instance of this Singleton<br></br>
-        /// May throw an Exception if this got not correctly initialized.
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="PackageProviderInitializationException"></exception>
-        public static PackageProvider GetInstance() {
-            if(_Instance is null) {
-                _Instance = InitializePackageProvider().Match(
-                    success: (provider) => provider,
-                    failure: (providerException) => throw providerException);
-            }
-
-            return _Instance;
-        }
-
-        /// <summary>This can be used to Initialize the Singleton to make sure everything is fine on application startup and handle/display Exceptions</summary>
-        private static Result<PackageProvider, PackageProviderInitializationException> InitializePackageProvider() {
+        /// <summary> This can be used to retrieve an initialized Instance of the <see cref="PackageProvider"/>-Class</summary>
+        public static Result<PackageProvider, PackageProviderInitializationException> GetInitializedPackageProvider(Logger logger) {
             try {
-                _Instance = new PackageProvider();
-                return _Instance;
+                return new PackageProvider(logger);
             } catch(Exception e) {
-                return new PackageProviderInitializationException(
-                    $"Thrown in \"{nameof(InitializePackageProvider)}\"\r\nAn Error occured while initializing the {nameof(PackageProvider)}",
-                    innerException: e);
+                return new PackageProviderInitializationException($"Thrown in \"{nameof(GetInitializedPackageProvider)}\"\r\nAn Error occured while initializing the {nameof(PackageProvider)}",
+                                                                  innerException: e);
             }
         }
         #endregion ctor
 
         #region prop
-        private Logger _Logger;
+        public readonly DirectoryInfo PackageDirectory = Directory.CreateDirectory(_DefaultPackagePath);
+        private static readonly string _DefaultPackagePath = Path.Combine(Directory.GetCurrentDirectory(), path2: "packages");
+
+        private static readonly TimeSpan _FileSystemTimeout = TimeSpan.FromSeconds(value: 10);
+
+        private readonly Logger _Logger;
+
+        private static object _Padlock = new object();
         #endregion prop
 
         #region Get Packages
@@ -111,8 +96,8 @@ namespace TheMover.Infrastructure.Provider {
 
         private Result<MovablePackage, Exception> GetPackageFromZipFile(FileInfo zipFile) {
             // Wait for File access before starting
-            if(zipFile.IsBlockedBySomeProccess()) {
-                _ = zipFile.WaitForFileAccess(FileSystemTimeout);
+            if(zipFile.IsBlockedBySomeProcess()) {
+                _ = zipFile.WaitForFileAccess(_FileSystemTimeout);
             }
 
             List<FileInfo> archivedFiles = new();
@@ -161,8 +146,8 @@ namespace TheMover.Infrastructure.Provider {
             } catch(Exception e) { return e; }
 
             // Wait for File access before starting
-            if(packageToMove.IsBlockedBySomeProccess()) {
-                _ = packageToMove.WaitForFileAccess(FileSystemTimeout);
+            if(packageToMove.IsBlockedBySomeProcess()) {
+                _ = packageToMove.WaitForFileAccess(_FileSystemTimeout);
             }
 
             using(ZipArchive zipArchiveToMove = ZipFile.OpenRead(packageToMove.FullName)) {
@@ -192,8 +177,8 @@ namespace TheMover.Infrastructure.Provider {
             }
 
             // Wait for File access before starting
-            if(packageToDelete.IsBlockedBySomeProccess()) {
-                _ = packageToDelete.WaitForFileAccess(FileSystemTimeout);
+            if(packageToDelete.IsBlockedBySomeProcess()) {
+                _ = packageToDelete.WaitForFileAccess(_FileSystemTimeout);
             }
 
             // For now we wont check if we are still blocked. We may just explode here
@@ -223,8 +208,8 @@ namespace TheMover.Infrastructure.Provider {
             } catch(Exception e) { return e; }
 
             // Wait for File access before starting
-            if(packageToExport.IsBlockedBySomeProccess()) {
-                _ = packageToExport.WaitForFileAccess(FileSystemTimeout);
+            if(packageToExport.IsBlockedBySomeProcess()) {
+                _ = packageToExport.WaitForFileAccess(_FileSystemTimeout);
             }
 
             // Return exception if the package can not be copied
@@ -254,8 +239,8 @@ namespace TheMover.Infrastructure.Provider {
             }
 
             // Wait for File access before starting
-            if(sourceFile.IsBlockedBySomeProccess()) {
-                _ = sourceFile.WaitForFileAccess(FileSystemTimeout);
+            if(sourceFile.IsBlockedBySomeProcess()) {
+                _ = sourceFile.WaitForFileAccess(_FileSystemTimeout);
             }
 
             // Return exception if the package can not be copied
@@ -277,10 +262,11 @@ namespace TheMover.Infrastructure.Provider {
         public bool PackageExists(string packageNameToFind, out FileInfo? packageToFind) {
             packageNameToFind = packageNameToFind.TrimFileExtenstion();
             packageToFind = GetZippedPackagesFromIO().Match(x => x, err => [])
-                .FirstOrDefault(file => packageNameToFind == file.Name.TrimFileExtenstion());
+                                                     .FirstOrDefault(file => packageNameToFind == file.Name.TrimFileExtenstion());
 
             return packageToFind is not null;
         }
         #endregion Helper
+
     }
 }

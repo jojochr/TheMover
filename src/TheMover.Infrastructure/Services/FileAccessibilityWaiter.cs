@@ -1,14 +1,14 @@
 namespace TheMover.Infrastructure.Services {
-    internal static class FileAccesibilityWaiter {
+    internal static class FileAccessibilityWaiter {
         /// <summary>This is a method that may block for the time specified in <paramref name="timeout"/></summary>
         /// <returns>True -> If the file is accessible right now<br/>False -> if we ran into a timeout and the file is still inaccessible</returns>
         public static bool WaitForFileAccess(this FileInfo fileToWaitFor, TimeSpan timeout) {
             bool hasBeenCanceled = false;
             CancellationTokenSource source = new CancellationTokenSource();
             Timer timeOutTimer = new((o) => {
-                source.Cancel(false);
+                source.Cancel(throwOnFirstException: false);
                 hasBeenCanceled = true;
-            }, null, timeout, Timeout.InfiniteTimeSpan);
+            }, state: null, timeout, Timeout.InfiniteTimeSpan);
 
             Task.Run(() => WaitTillFileIsAvailableAsync(fileToWaitFor, source.Token), source.Token).GetAwaiter().GetResult();
 
@@ -18,15 +18,16 @@ namespace TheMover.Infrastructure.Services {
 
         /// <summary>CAUTION!!! This will block until some file is accessible. Please only use this with a cancellation Token and use it.</summary>
         /// <param name="file">File to be monitored</param>
+        /// <param name="token">Token in case we want to cancel this</param>
         private static async Task WaitTillFileIsAvailableAsync(FileInfo file, CancellationToken token) {
-            bool fileIsBlocked = IsBlockedBySomeProccess(file);
+            bool fileIsBlocked = IsBlockedBySomeProcess(file);
 
             using var watcher = new FileSystemWatcher(file.DirectoryName!, $"*{file.Name}{file.Extension}") {
                 EnableRaisingEvents = true,
             };
 
             // On file changes check if we are still blocked
-            watcher.Changed += (_, _) => fileIsBlocked = file.IsBlockedBySomeProccess();
+            watcher.Changed += (_, _) => fileIsBlocked = file.IsBlockedBySomeProcess();
 
             do {
                 if(fileIsBlocked == false || token.IsCancellationRequested) {
@@ -41,7 +42,7 @@ namespace TheMover.Infrastructure.Services {
         /// <summary>Returns if a File is currently blocked by any Process</summary>
         /// <param name="fileToBeChecked"></param>
         /// <returns>True -> If the file is currently blocked<br/>False -> If the file is accessible right now</returns>
-        public static bool IsBlockedBySomeProccess(this FileInfo fileToBeChecked) {
+        public static bool IsBlockedBySomeProcess(this FileInfo fileToBeChecked) {
             // If the file can be opened for exclusive access it means that the file
             // is no longer locked by another process.
             try {

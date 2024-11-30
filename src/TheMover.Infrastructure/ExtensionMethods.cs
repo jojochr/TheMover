@@ -1,6 +1,6 @@
 namespace TheMover.Infrastructure {
     public static class ExtensionMethods {
-        public static string TrimFileExtenstion(this FileInfo file) => file.Name.Substring(0, file.Name.Length - file.Extension.Length);
+        public static string TrimFileExtenstion(this FileInfo file) => file.Name.Substring(startIndex: 0, file.Name.Length - file.Extension.Length);
         public static string TrimFileExtenstion(this string fileName) {
             if(string.IsNullOrWhiteSpace(fileName)) {
                 return string.Empty;
