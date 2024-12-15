@@ -54,19 +54,20 @@ namespace TheMover.Infrastructure.Provider {
                     return error!; // Error must be non nul if we end up here
                 }
 
-                zipFilesInPackagesDirectory = zippedFilesResult.Match(files => files, error => new());
+                zipFilesInPackagesDirectory = zippedFilesResult.Match(files => files, _ => []);
             }
 
             List<MovablePackage> packages = [];
             // Return if error
             foreach(var file in zipFilesInPackagesDirectory) {
-                GetPackageFromZipFile(file).Match(success: packages.Add, failure: _Logger.Log); // For now just log errors
+                GetPackageFromZipFile(file).Match(success: packages.Add,
+                                                  failure: ex => _Logger.Log(new LogMessage(ex))); // For now just log errors
             }
 
             return packages;
         }
 
-        /// <summary>Gets all the package-archives files from <see cref="PackageDirectory"/><br></br>
+        /// <summary>Gets all the package-archives files from <see cref="PackageDirectory"/><br/>
         /// Remember that all those zip archives should be disposed in the end.
         /// </summary>
         private Result<List<FileInfo>, Exception> GetZippedPackagesFromIO() {
@@ -107,7 +108,7 @@ namespace TheMover.Infrastructure.Provider {
                 if(zipArchive is null) {
                     try {
                         File.Delete(zipFile.FullName);
-                        _Logger.Log(new LogMessage("Deleted empty Zip-Packagefile.", LogMessageSeverity.Information));
+                        _Logger.Log(new LogMessage("Deleted empty Zip-Package.", LogMessageSeverity.Information));
                         return new Exception("Empty Zip file in Package repository detected and deleted.");
                     } catch(Exception e) {
                         return new Exception("Error while deleting an Empty ZipArchive", e);
@@ -118,7 +119,7 @@ namespace TheMover.Infrastructure.Provider {
                     try {
                         archivedFiles.Add(new FileInfo(Path.Combine(zipFile.FullName, entry.FullName)));
                     } catch {
-                        continue;
+                        // ignored
                     }
                 }
             }
@@ -181,7 +182,7 @@ namespace TheMover.Infrastructure.Provider {
                 _ = packageToDelete.WaitForFileAccess(_FileSystemTimeout);
             }
 
-            // For now we wont check if we are still blocked. We may just explode here
+            // For now, we won't check if we are still blocked. We may just explode here
             File.Delete(packageToDelete.FullName);
 
             return Option<Exception>.None;
@@ -257,12 +258,12 @@ namespace TheMover.Infrastructure.Provider {
         /// This method can be used to check if a package exists.
         /// </summary>
         /// <param name="packageNameToFind"></param>
-        /// <param name="packageToFind">If the package is not found this will be null, if this method returns true you can assume this to be non null</param>
+        /// <param name="packageToFind">If the package is not found this will be null, if this method returns true you can assume this to be non-null</param>
         /// <returns>True -> If the package exists<br></br>False -> Package does not exist</returns>
         public bool PackageExists(string packageNameToFind, out FileInfo? packageToFind) {
             packageNameToFind = packageNameToFind.TrimFileExtenstion();
-            packageToFind = GetZippedPackagesFromIO().Match(x => x, err => [])
-                                                     .FirstOrDefault(file => packageNameToFind == file.Name.TrimFileExtenstion());
+            packageToFind = GetZippedPackagesFromIO().Match(x => x, _ => [])
+               .FirstOrDefault(file => packageNameToFind == file.Name.TrimFileExtenstion());
 
             return packageToFind is not null;
         }

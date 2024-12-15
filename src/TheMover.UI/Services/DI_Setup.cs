@@ -15,12 +15,7 @@ namespace TheMover.UI.Services {
             ServiceCollection services = [];
 
             // From Domain
-            LoggerInitializationException? maybeException = Logger.InitializeLogger().Reduce(null!);
-            if(maybeException is not null) {
-                throw maybeException;
-            }
-            
-            services.AddSingleton(Logger.GetInstance());
+            services.AddSingleton(new Logger());
 
             // From Infrastructure Project
             services.AddSingleton<PackageProvider>();

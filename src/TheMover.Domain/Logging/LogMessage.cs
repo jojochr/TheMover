@@ -1,6 +1,6 @@
 namespace TheMover.Domain.Logging {
     public class LogMessage {
-        public LogMessage(ErrorKey errorKey, string message, LogMessageSeverity severity) {
+        public LogMessage(string message, LogMessageSeverity severity, ErrorKey? errorKey = null) {
             ErrorKey = errorKey;
             Message = message;
             Severity = severity;
