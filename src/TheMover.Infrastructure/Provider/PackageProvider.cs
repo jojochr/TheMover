@@ -22,8 +22,9 @@ namespace TheMover.Infrastructure.Provider {
             try {
                 return new PackageProvider(logger);
             } catch(Exception e) {
-                return new PackageProviderInitializationException($"Thrown in \"{nameof(GetInitializedPackageProvider)}\"\r\nAn Error occured while initializing the {nameof(PackageProvider)}",
-                                                                  innerException: e);
+                return new PackageProviderInitializationException($"Thrown in \"{nameof(GetInitializedPackageProvider)}\"{Environment.NewLine}" +
+                                                                     $"An Error occured while initializing the {nameof(PackageProvider)}",
+                                                                     innerException: e);
             }
         }
         #endregion ctor

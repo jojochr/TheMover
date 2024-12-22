@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using TheMover.Domain.Logging;
 
 namespace TheMover.UI.ViewModels;
 
@@ -11,6 +12,7 @@ public partial class MainWindowViewModel : ViewModelBase {
     public MainWindowViewModel(PackageOperationsViewModel operationsViewModel) {
         _PackageOperationsViewModel = operationsViewModel;
     }
+
     [ObservableProperty]
     private PackageOperationsViewModel _PackageOperationsViewModel;
 }

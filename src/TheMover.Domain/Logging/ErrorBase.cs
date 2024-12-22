@@ -1,6 +1,9 @@
+using System.Diagnostics;
+
 namespace TheMover.Domain.Logging {
     public abstract class ErrorBase {
         public Guid Identifier { get; private set; } = Guid.NewGuid();
+        public DateTime Timestamp { get; private set; } = DateTime.Now;
         public abstract ErrorSeverity Severity { get; protected set; }
         public abstract ErrorKey ErrorKey { get; protected set; }
         public abstract string Description { get; protected set; }

@@ -15,10 +15,17 @@ namespace TheMover.UI.Services {
             ServiceCollection services = [];
 
             // From Domain
-            services.AddSingleton(new Logger());
+#if RELEASE
+            Logger logger = new(useConsole: false, useLogDirectory: true);
+#else
+            Logger logger = new(useConsole: true, useLogDirectory: true);
+#endif
+            services.AddSingleton(logger);
 
             // From Infrastructure Project
-            services.AddSingleton<PackageProvider>();
+            PackageProvider.GetInitializedPackageProvider(logger).Match(success: packageProvider => services.AddSingleton(packageProvider),
+                                                                        failure: _ => logger.Log(new LogMessage("Could not create PackageProvider on initialization",
+                                                                                                                LogMessageSeverity.Panic, ErrorKey.Panic)));
             services.AddSingleton<RepositoryWatcher>();
 
             // From UI
@@ -27,7 +34,6 @@ namespace TheMover.UI.Services {
             services.AddTransient<DesignPackageOperationsViewModel>();
             services.AddSingleton<FileIconService>();
             services.AddSingleton<FrontendMovablePackageBuilder>();
-
 
             return services.BuildServiceProvider();
         }

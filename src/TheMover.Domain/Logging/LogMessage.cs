@@ -1,5 +1,5 @@
 namespace TheMover.Domain.Logging {
-    public class LogMessage {
+    public record LogMessage {
         public LogMessage(string message, LogMessageSeverity severity, ErrorKey? errorKey = null) {
             ErrorKey = errorKey;
             Message = message;
@@ -9,6 +9,7 @@ namespace TheMover.Domain.Logging {
         /// <summary>This Constructor is used to create a <see cref="LogMessage"/> from an <see cref="ErrorBase"/></summary>
         public LogMessage(ErrorBase error) {
             Identifier = error.Identifier;
+            Timestamp = error.Timestamp;
             ErrorKey = error.ErrorKey;
             Message = error.LongMessage;
 
@@ -31,6 +32,7 @@ namespace TheMover.Domain.Logging {
         }
 
         public readonly Guid Identifier = Guid.NewGuid();
+        public DateTime Timestamp = DateTime.Now;
         public readonly ErrorKey? ErrorKey;
         public readonly string Message;
         public readonly LogMessageSeverity Severity;

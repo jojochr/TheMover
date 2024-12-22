@@ -32,7 +32,13 @@ namespace TheMover.Domain.Logging {
             private static readonly string _DefaultLogPath = Path.Combine(Directory.GetCurrentDirectory(), path2: "log");
             private readonly DirectoryInfo _LogDirectory = Directory.CreateDirectory(_DefaultLogPath);
 
-            public void Log(LogMessage message) { }
+            public void Log(LogMessage message) {
+                using FileStream file = File.Create(Path.Combine(_LogDirectory.FullName, $"Log_{message.Timestamp.ConvertToUnixTimestamp()}.txt"));
+                using StreamWriter streamWriter = new (file);
+
+                // Print the record very lazy vor now
+                streamWriter.WriteLine(message);
+            }
         }
     }
 }

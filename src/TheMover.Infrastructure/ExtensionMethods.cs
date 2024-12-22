@@ -17,6 +17,7 @@ namespace TheMover.Infrastructure {
             return fileInfo?.TrimFileExtenstion() ?? string.Empty;
         }
 
+        /// <summary>Can be used to dispose all <see cref="IDisposable"/>s in an <see cref="IEnumerable{T}"/></summary>
         public static void DisposeAll<T>(this IEnumerable<T> toDispose) where T : IDisposable {
             foreach(var thing in toDispose) {
                 thing.Dispose();

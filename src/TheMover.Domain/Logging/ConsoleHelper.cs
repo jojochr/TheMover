@@ -6,7 +6,7 @@ namespace TheMover.Domain.Logging {
             AllocConsole();
 
             // This Code is from: https://stackoverflow.com/questions/15604014/no-console-output-when-using-allocconsole-and-target-architecture-x86
-            IntPtr defaultStdout = new IntPtr(7);
+            IntPtr defaultStdout = new(7);
             IntPtr currentStdout = GetStdHandle(STD_OUTPUT_HANDLE);
 
             if(currentStdout != defaultStdout) {
