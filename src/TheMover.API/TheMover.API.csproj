@@ -5,6 +5,18 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <LangVersion>latest</LangVersion>
+        <NeutralLanguage>en</NeutralLanguage>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <DefineConstants>TRACE DEBUG</DefineConstants>
+      <DocumentationFile>bin\Debug\TheMover.API.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <PlatformTarget>x64</PlatformTarget>
+      <DocumentationFile>bin\Release\TheMover.API.xml</DocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -13,6 +25,9 @@
 
     <ItemGroup>
         <PackageReference Include="Grpc.AspNetCore" Version="2.64.0"/>
+        <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.67.0" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.1" />
+        <PackageReference Include="Scalar.AspNetCore" Version="2.0.4" />
     </ItemGroup>
 
 </Project>
