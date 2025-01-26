@@ -1,11 +1,8 @@
 name: Deploy TheMover API
 on:
-  workflow_dispatch:
-    inputs:
-      logLevel:
-        description: 'Log level'
-        required: true
-        default: 'warning'
+  pull_request:
+    branches:
+      - main
 
 permissions:
   packages: write

@@ -19,5 +19,9 @@ WORKDIR /app
 # Copy build artifacts from earlier build Stage
 COPY --from=build /app ./
 
-EXPOSE 8080/tcp
+# REST-API Port
+EXPOSE 5000/tcp
+# GRPC-Interface Port
+EXPOSE 5001/tcp
+
 ENTRYPOINT ["dotnet", "TheMover.API.dll"]
