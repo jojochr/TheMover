@@ -1,0 +1,14 @@
+# This is just meant for local development
+# Look into docker-stack.yaml and release pipelines for builds on Prod
+services:
+  server:
+    container_name: "Dev-TheMover-API"
+    build:
+      context: .
+      target: final
+    ports:
+      # GRPC-Interface Port
+      - mode: host
+        protocol: tcp
+        published: 50051 #Facing the public
+        target: 8080     #Mapped to port inside the container
