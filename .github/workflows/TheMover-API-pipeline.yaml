@@ -1,0 +1,78 @@
+name: Deploy TheMover API
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+
+permissions:
+  packages: write
+
+defaults:
+  run:
+    shell: bash
+    working-directory: ./src/TheMover.API
+
+jobs:
+  build-and-push-image:
+    name: Build Docker image and push to github registry
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.CLONE_ANY_JOJOCHR_REPOSITORY_TOKEN }}
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: https://ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./src/TheMover.API
+          push: true
+          tags: |
+            ghcr.io/jojochr/the_mover-api:latest
+            ghcr.io/jojochr/the_mover-api:${{ github.sha }}
+
+  deploy:
+    name: Deploy newest image on VPS
+    runs-on: ubuntu-latest
+    needs:
+      - build-and-push-image
+
+    steps:
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: https://ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Clone repo for access to docker-stack.yaml
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.CLONE_ANY_JOJOCHR_REPOSITORY_TOKEN }}
+
+      # Create environment file to hold image hash
+      - name: Create env file
+        run: |
+          echo "GIT_COMMIT_HASH=${{ github.sha }}" >> ./envfile
+
+      - name: Docker Stack Deploy
+        uses: cssnr/stack-deploy-action@v1.0.0
+        with:
+          name: TheMover-API
+          file: ./src/TheMover.API/docker-stack.yaml
+          host: 217.160.208.40
+          user: deploy
+          ssh_key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          env_file: ./src/TheMover.API/envfile
