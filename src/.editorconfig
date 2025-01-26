@@ -1,0 +1,165 @@
+root = true
+
+[*.cs]
+indent_style = space
+dotnet_style_operator_placement_when_wrapping = beginning_of_line
+tab_width = 2
+end_of_line = crlf
+max_line_length = 200
+insert_final_newline = true
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
+dotnet_style_prefer_auto_properties = true:silent
+dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
+dotnet_style_prefer_conditional_expression_over_assignment = true:silent
+dotnet_style_prefer_conditional_expression_over_return = true:silent
+
+# 
+# NOTE: 
+#
+# https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference
+# 
+# Good resource for most values
+# https://github.com/dotnet/roslyn/blob/master/.editorconfig 
+#
+
+# Avoid "this." for methods, fields, events and properties
+dotnet_style_qualification_for_field = false:error
+dotnet_style_qualification_for_method = false:error
+dotnet_style_qualification_for_property = false:error
+dotnet_style_qualification_for_event = false:error
+
+# Use language keywords instead of framework type names for type references (such as int not Int32)
+dotnet_style_predefined_type_for_locals_parameters_members = true:error
+dotnet_style_predefined_type_for_member_access = true:error
+
+# Prefer "var" everywhere
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = true:suggestion
+
+# Prefer property-like constructs to have an expression-body (properties using => instead of {})
+csharp_style_expression_bodied_properties = true:suggestion
+csharp_style_expression_bodied_indexers = true:suggestion
+csharp_style_expression_bodied_accessors = true:suggestion
+
+# Force objects to initialize their members inside {} on construction
+dotnet_style_object_initializer = true:warning
+dotnet_style_collection_initializer = true:warning
+
+# Force pattern matching over cast checking
+#               if (o is int i)
+#   instead of: if (o is int) { var i = (int)o; }
+csharp_style_pattern_matching_over_is_with_cast_check = true:warning
+
+# Force pattern matching over null checking
+#                if (o is string s)
+#    instead of: var s = (string)o; if (s != null) {}
+csharp_style_pattern_matching_over_as_with_null_check = true:error
+
+# Force using tuple names never the Item1, Item2 etc...
+dotnet_style_explicit_tuple_names = true:suggestion
+
+# Force inline variable declaration
+#             SomeCall(out onError e)
+# instead of: int e; SomeCall(out e);
+csharp_style_inlined_variable_declaration = true:warning
+
+# Force use of ?? for throwing on null checks
+#             var b = a ?? throw();
+# instead of: if (a == null) { throw(); } b = a;
+csharp_style_throw_expression = true:warning
+
+# Force calling delegates with null check
+#             func?.Invoke()
+# instead of: if (func != null) func();
+csharp_style_conditional_delegate_call = true:error
+
+# Force expression coalescing 
+#             var a = x ?? y;
+# instead of: var a = x == null ? y : x;
+dotnet_style_coalesce_expression = true:error
+
+# Force null propagation
+#             var s = o?.ToString()
+# instead of: var s = o == null ? null : o.ToString()
+dotnet_style_null_propagation = true:error
+
+csharp_indent_labels = flush_left
+csharp_using_directive_placement = outside_namespace:silent
+csharp_prefer_simple_using_statement = true:suggestion
+csharp_prefer_braces = true:warning
+csharp_style_namespace_declarations = file_scoped:silent
+csharp_style_prefer_method_group_conversion = true:warning
+csharp_style_prefer_top_level_statements = true:silent
+csharp_style_expression_bodied_methods = true:suggestion
+csharp_style_expression_bodied_constructors = true:suggestion
+csharp_style_expression_bodied_operators = true:suggestion
+csharp_style_expression_bodied_lambdas = false:suggestion
+csharp_style_expression_bodied_local_functions = true:suggestion
+
+#
+# NAMING CONVENTIONS
+#
+
+# Locals should be camel_case
+dotnet_naming_rule.locals_camel_case.severity = error
+dotnet_naming_rule.locals_camel_case.symbols = locals_camel_case_symbols
+dotnet_naming_rule.locals_camel_case.style = locals_camel_case_style
+
+dotnet_naming_style.locals_camel_case_style.capitalization = camel_case
+dotnet_naming_symbols.locals_camel_case_symbols.applicable_kinds = local
+
+# Parameters should be camel_case
+dotnet_naming_rule.parameters_camel_case.severity = error
+dotnet_naming_rule.parameters_camel_case.symbols = parameters_camel_case_symbols
+dotnet_naming_rule.parameters_camel_case.style = parameters_camel_case_style
+
+dotnet_naming_style.parameters_camel_case_style.capitalization = camel_case
+dotnet_naming_symbols.parameters_camel_case_symbols.applicable_kinds = parameter
+
+# Properties should be pascal_case
+dotnet_naming_rule.public_properties_pascal.severity = suggestion
+dotnet_naming_rule.public_properties_pascal.symbols = public_properties_pascal_symbols
+dotnet_naming_rule.public_properties_pascal.style = public_properties_pascal_style
+
+dotnet_naming_style.public_properties_pascal_style.capitalization = pascal_case
+dotnet_naming_symbols.public_properties_pascal_symbols.applicable_kinds = field, property
+dotnet_naming_symbols.public_properties_pascal_symbols.applicable_accessibilities = public, internal
+
+# Member fields must start with _ then camelCase
+dotnet_naming_rule.members_start_with_underscore.severity = warning
+dotnet_naming_rule.members_start_with_underscore.symbols = members_start_with_underscore_symbols
+dotnet_naming_rule.members_start_with_underscore.style = members_start_with_underscore_style
+
+dotnet_naming_style.members_start_with_underscore_style.capitalization = camel_case
+dotnet_naming_style.members_start_with_underscore_style.required_prefix = _
+dotnet_naming_symbols.members_start_with_underscore_symbols.applicable_kinds = field, delegate, event, property
+dotnet_naming_symbols.members_start_with_underscore_symbols.applicable_accessibilities = private, protected, protected_internal
+
+# Constants start with c_
+dotnet_naming_rule.constants_start_with_c.severity = warning
+dotnet_naming_rule.constants_start_with_c.symbols = constants_start_with_c_symbols
+dotnet_naming_rule.constants_start_with_c.style = constants_start_with_c_style
+
+dotnet_naming_style.constants_start_with_c_style.capitalization = pascal_case
+dotnet_naming_style.constants_start_with_c_style.required_prefix = c_
+dotnet_naming_symbols.constants_start_with_c_symbols.applicable_kinds = *
+dotnet_naming_symbols.constants_start_with_c_symbols.required_modifiers = const
+
+# Classes, Interfaces, Structs, Enums, Methods, Events and Delegates are PascalCase
+dotnet_naming_rule.types_pascal.severity = error
+dotnet_naming_rule.types_pascal.symbols = types_pascal_symbols
+dotnet_naming_rule.types_pascal.style = types_pascal_style
+
+dotnet_naming_style.types_pascal_style.capitalization = pascal_case
+dotnet_naming_symbols.types_pascal_symbols.applicable_kinds = class, interface, struct, enum, method, event, delegate
+
+# Async methods end with Async
+dotnet_naming_rule.async_methods_must_end_with_async.severity = error
+dotnet_naming_rule.async_methods_must_end_with_async.symbols = async_methods_must_end_with_async_symbols
+dotnet_naming_rule.async_methods_must_end_with_async.style = async_methods_must_end_with_async_style
+
+dotnet_naming_symbols.async_methods_must_end_with_async_symbols.applicable_kinds = method
+dotnet_naming_symbols.async_methods_must_end_with_async_symbols.required_modifiers = async
+dotnet_naming_style.async_methods_must_end_with_async_style.capitalization = pascal_case
+dotnet_naming_style.async_methods_must_end_with_async_style.required_suffix = Async
