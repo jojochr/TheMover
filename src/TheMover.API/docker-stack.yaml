@@ -1,0 +1,10 @@
+services:
+  server:
+    container_name: "TheMover-API"
+    image: ghcr.io/jojochr/the_mover-api:${GIT_COMMIT_HASH:-latest}
+    ports:
+      # GRPC-Interface Port
+      - mode: host
+        protocol: tcp
+        published: 50051 #Facing the public
+        target: 8080     #Mapped to port inside the container
