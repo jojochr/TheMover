@@ -1,16 +1,12 @@
-name: Deploy TheMover API
+name: Deploy TheMover Stack to VPS
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - main
 
 permissions:
   packages: write
-
-defaults:
-  run:
-    shell: bash
-    working-directory: ./src/TheMover.API
 
 jobs:
   build-and-push-image:
@@ -59,17 +55,20 @@ jobs:
         with:
           token: ${{ secrets.CLONE_ANY_JOJOCHR_REPOSITORY_TOKEN }}
 
-      # Create environment file to hold image hash
+      # Create environment file to hold
+      # - git hash to get the exact docker image for the current commit
+      # - my cloudflare API Token so Traefik can do the DNS-challenge
       - name: Create env file
         run: |
           echo "GIT_COMMIT_HASH=${{ github.sha }}" >> ./envfile
+          echo "CLOUDFLARE_DNS_API_TOKEN=${{ secrets.CLOUDFLARE_DNS_API_TOKEN }}" >> ./envfile
 
       - name: Docker Stack Deploy
         uses: cssnr/stack-deploy-action@v1.0.0
         with:
           name: TheMover-API
-          file: ./src/TheMover.API/docker-stack.yaml
+          file: ./docker-stack.yaml
           host: 217.160.208.40
           user: deploy
           ssh_key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
-          env_file: ./src/TheMover.API/envfile
+          env_file: ./envfile
