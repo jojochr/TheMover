@@ -59,7 +59,7 @@ services:
       - traefik.enable=true
 
       # Create traefik router to reroute rest-api requests to the correct container port
-      - traefik.http.routers.themover-restapi.rule=Host('api.themover.site')
+      - traefik.http.routers.themover-restapi.rule=Host(`api.themover.site`)
       - traefik.http.routers.themover-restapi.tls=true
       - traefik.http.routers.themover-restapi.tls.certresolver=cloudflare
       - traefik.http.routers.themover-restapi.entrypoints=websecure
@@ -67,7 +67,7 @@ services:
       - traefik.http.services.restapi-service.loadbalancer.server.port=5000
       
       # Create traefik router to reroute grpc requests to the correct container port
-      - traefik.http.routers.themover-grpc.rule=Host('grpc.themover.site')
+      - traefik.http.routers.themover-grpc.rule=Host(`grpc.themover.site`)
       - traefik.http.routers.themover-grpc.tls=true
       - traefik.http.routers.themover-grpc.tls.certresolver=cloudflare
       - traefik.http.routers.themover-grpc.entrypoints=websecure
