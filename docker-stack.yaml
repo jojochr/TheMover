@@ -6,9 +6,18 @@ services:
       # Only listen to default browser ports for now
       - "80:80"
       - "443:443"
+      - "8080:8008" # Port for debug dashboard
     command:
       - "--global.checknewversion=false"
       - "--global.sendanonymoususage=false"
+      
+      # For debug purposes
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
+
+      - "--log.level=DEBUG"
+      - "--log.filePath=/var/log/traefik.log"
+      - "--log.format=json"
 
       # Use docker as my provider
       - "--providers.docker"
