@@ -41,6 +41,25 @@ services:
       - traefik_certs:/letsencrypt
     restart: unless-stopped
   
+  cert-dumper:
+    # Latest version on creation of this
+    image: ldez/traefik-certs-dumper:v2.9.3
+    container_name: traefik-certs-dumper
+    # Run the following script on startup
+    entrypoint: sh -c '
+      while ! [ -e /letsencrypt/cloudflare-acme.json ]
+      || ! [ `jq ".[] | .Certificates | length" /letsencrypt/cloudflare-acme.json | jq -s "add" ` != 0 ]; do
+      sleep 1
+      ; done
+      && traefik-certs-dumper file --version v2 --watch --domain-subdir
+      --source /letsencrypt/cloudflare-acme.json --dest /letsencrypt'
+    labels:
+      # No routing for this one
+      - traefik.enable=false
+    volumes:
+      # Use the shared certificates volume
+      - traefik_certs:/letsencrypt
+  
   server:
     container_name: "TheMover-API"
     image: ghcr.io/jojochr/the-mover_api:${GIT_COMMIT_HASH:-latest}
