@@ -43,7 +43,7 @@ services:
   
   server:
     container_name: "TheMover-API"
-    image: ghcr.io/jojochr/the_mover-api:${GIT_COMMIT_HASH:-latest}
+    image: ghcr.io/jojochr/the-mover_api:${GIT_COMMIT_HASH:-latest}
     ports:
       # REST-API Port
       - mode: host

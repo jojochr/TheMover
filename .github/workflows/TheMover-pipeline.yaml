@@ -32,8 +32,8 @@ jobs:
           context: ./src/TheMover.API
           push: true
           tags: |
-            ghcr.io/jojochr/the_mover-api:latest
-            ghcr.io/jojochr/the_mover-api:${{ github.sha }}
+            ghcr.io/jojochr/the-mover_api:latest
+            ghcr.io/jojochr/the-mover_api:${{ github.sha }}
 
   deploy:
     name: Deploy newest image on VPS
@@ -66,7 +66,7 @@ jobs:
       - name: Docker Stack Deploy
         uses: cssnr/stack-deploy-action@v1.0.0
         with:
-          name: TheMover-API
+          name: TheMover
           file: ./docker-stack.yaml
           host: 217.160.208.40
           user: deploy
