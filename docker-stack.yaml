@@ -69,6 +69,10 @@ services:
         protocol: tcp
         published: 4999
         target: 4999
+    environment:
+      # Add letsencrypt Certificate for node.js server
+      - SERVER_CERT_PATH=/letsencrypt/themover.site/certificate.crt
+      - SERVER_KEY_PATH=/letsencrypt/themover.site/privatekey.key
     labels:
       - traefik.enable=true
 
