@@ -59,6 +59,7 @@ services:
     volumes:
       # Use the shared certificates volume
       - traefik_certs:/letsencrypt
+    restart: unless-stopped
 
   themover-web:
     container_name: "TheMover-Web"
@@ -84,7 +85,7 @@ services:
       - traefik.http.routers.themover-web.service=web-service
       - traefik.http.services.web-service.loadbalancer.server.port=4999
     volumes:
-      - traefik_certs:/letsencrypt
+      - traefik_certs:/letsencrypt:ro
     restart: unless-stopped
 
   themover-api:
@@ -121,7 +122,7 @@ services:
       - traefik.http.services.grpc-service.loadbalancer.server.port=5001
     volumes:
       # Use the shared certificates volume
-      - traefik_certs:/letsencrypt
+      - traefik_certs:/letsencrypt:ro
     restart: unless-stopped
 
 volumes:

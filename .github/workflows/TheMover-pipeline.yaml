@@ -30,6 +30,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./src/TheMover.Web
+          target: final
           push: true
           tags: |
             ghcr.io/jojochr/the-mover_web:latest
@@ -57,6 +58,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./src/TheMover.API
+          target: final
           push: true
           tags: |
             ghcr.io/jojochr/the-mover_api:latest
