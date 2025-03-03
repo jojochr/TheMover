@@ -3,6 +3,11 @@ using TheMover.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Enable gRPC without HTTPS
+// -> Traefik decrypts HTTPS requests before they reach this api
+// -> This doing it like this does not reduce security but makes certificate handling much easier in docker 
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+
 // Add services to the container.
 builder.Services.AddGrpc();
 builder.Services.AddGrpcReflection();
