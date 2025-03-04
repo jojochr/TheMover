@@ -42,7 +42,8 @@ jobs:
           EOF
           
           # Save for later use
-          SSH_CONFIG_FILE="$(realpath ./ssh_config)"
+          export SSH_CONFIG_FILE="$(realpath ./ssh_config)"
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
