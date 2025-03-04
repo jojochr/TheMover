@@ -1,0 +1,49 @@
+name: Nuke all TheMover infrastructure from VPS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  delete-all-docker-components:
+    name: Remove all docker components tied to my TheMover Deployment
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup SSH
+        working-directory: ./ssh-stuff
+        run: |
+          # Create known_hosts, so we can connect via ssh without confirming stuff 
+          ssh-keyscan hostname >> ./known_hosts
+          ssh-keygen -H -f ./known_hosts
+          rm .known_hosts.old
+          
+          # Create file for ssh key
+          echo ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }} >> ./deploy.key
+          DEPLOY_KEY_FILE="(realpath deploy.key)"
+          
+          # Create ssh config file for ease of use later on
+          cat >> ./ssh_config << EOF
+          Host VPS
+              hostname 217.160.208.40
+              User deploy
+              Port 22
+              Preferredauthentications publickey
+              IdentityFile $DEPLOY_KEY_FILE
+              TCPKeepAlive yes
+              AddKeysToAgent yes
+          EOF
+
+      - name: Remove TheMover Stack
+        run: ssh -F ./ssh-stuff/ssh_config VPS "docker stack rm TheMover"
+
+      - name: Remove TheMover Containers (if any are still running)
+        run: ssh -F ./ssh-stuff/ssh_config VPS "docker rm $(docker container ls --filter name="TheMover*" -q)"
+
+      - name: Remove TheMover images
+        run: ssh -F ./ssh-stuff/ssh_config VPS "docker rmi $(docker images --filter reference="*/*/the-mover*" -q)"
+
+      - name: Remove TheMover volumes
+        run: ssh -F ./ssh-stuff/ssh_config VPS "docker volume rm -f $(docker volume ls --filter name="TheMover*" -q)"
+
+      - name: Remove TheMover networks
+        run: ssh -F ./ssh-stuff/ssh_config VPS "docker network rm -f $(docker network ls --filter name="TheMover*" -q)"
