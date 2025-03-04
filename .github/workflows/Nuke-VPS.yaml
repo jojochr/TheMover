@@ -49,4 +49,10 @@ jobs:
           sparse-checkout: 'deployment'
 
       - name: Run deletion-script on VPS
-        run: ssh -F $SSH_CONFIG_FILE VPS 'bash -s' < ./deployment/Remove-Docker-Deployment.sh
+        run: |
+          echo "Start debug"
+          echo "SSH-Pfad \"$SSH_CONFIG_FILE\""
+          cat $SSH_CONFIG_FILE
+          echo "End debug"
+
+          ssh -F $SSH_CONFIG_FILE VPS 'bash -s' < ./deployment/Remove-Docker-Deployment.sh
