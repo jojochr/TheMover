@@ -1,0 +1,54 @@
+name: Nuke TheMover from VPS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  delete-all-docker-components:
+    name: Remove all docker components tied to my TheMover Deployment
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: 'deployment'
+
+      # Do this after Checkout -> Because Checkout deletes home directory
+      - name: Setup SSH
+        run: |
+          mkdir ssh-stuff
+          cd ssh-stuff
+          
+          # Create known_hosts, so we can connect via ssh without confirming stuff
+          ssh-keyscan 217.160.208.40 >> ./known_hosts
+          ssh-keygen -H -f ./known_hosts
+          rm ./known_hosts.old
+          
+          # Create file for ssh key
+          echo "${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}" > ./deploy.key
+          # Restrict access or else ssh will complain, that access rights are set to loosely
+          chmod 600 ./deploy.key
+          
+          # Save those paths to be printed to config
+          KNOWN_HOSTS_FILE="$(realpath ./known_hosts)"
+          DEPLOY_KEY_FILE="$(realpath ./deploy.key)"
+          
+          # Create ssh config file for ease of use later on
+          cat >> ./ssh_config << EOF
+          Host VPS
+              hostname 217.160.208.40
+              Port 22
+              User deploy
+              UserKnownHostsFile $KNOWN_HOSTS_FILE
+              IdentityFile $DEPLOY_KEY_FILE
+              Preferredauthentications publickey
+              AddKeysToAgent yes
+              TCPKeepAlive yes
+          EOF
+          
+          # Save for later use
+          echo "SSH_CONFIG_FILE=$(realpath ./ssh_config)" >> $GITHUB_ENV
+
+      - name: Run deletion-script on VPS
+        run: ssh -F ${{ env.SSH_CONFIG_FILE }} VPS 'bash -s' < ./deployment/Remove-Docker-Deployment.sh
