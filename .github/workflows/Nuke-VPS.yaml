@@ -10,13 +10,14 @@ jobs:
 
     steps:
       - name: Setup SSH
+        id: setup_ssh
         run: |
           mkdir ssh-stuff
           cd ssh-stuff
           # Create known_hosts, so we can connect via ssh without confirming stuff 
-          ssh-keyscan hostname >> ./known_hosts
+          ssh-keyscan 217.160.208.40 >> ./known_hosts
           ssh-keygen -H -f ./known_hosts
-          rm .known_hosts.old
+          rm ./known_hosts.old
           
           # Create file for ssh key
           echo ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }} >> ./deploy.key
