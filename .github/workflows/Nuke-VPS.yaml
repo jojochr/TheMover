@@ -18,21 +18,25 @@ jobs:
           ssh-keyscan 217.160.208.40 >> ./known_hosts
           ssh-keygen -H -f ./known_hosts
           rm ./known_hosts.old
+          KNOWN_HOSTS_FILE="$(realpath ./known_hosts)"
           
           # Create file for ssh key
           echo "${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}" > ./deploy.key
-          DEPLOY_KEY_FILE="(realpath deploy.key)"
+          DEPLOY_KEY_FILE="$(realpath ./deploy.key)"
+          
+          echo $DEPLOY_KEY_FILE
           
           # Create ssh config file for ease of use later on
           cat >> ./ssh_config << EOF
           Host VPS
               hostname 217.160.208.40
-              User deploy
               Port 22
-              Preferredauthentications publickey
+              User deploy
+              UserKnownHostsFile $KNOWN_HOSTS_FILE
               IdentityFile $DEPLOY_KEY_FILE
-              TCPKeepAlive yes
+              Preferredauthentications publickey
               AddKeysToAgent yes
+              TCPKeepAlive yes
           EOF
 
       - name: Remove TheMover Stack
