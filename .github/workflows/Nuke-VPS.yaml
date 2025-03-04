@@ -18,13 +18,15 @@ jobs:
           ssh-keyscan 217.160.208.40 >> ./known_hosts
           ssh-keygen -H -f ./known_hosts
           rm ./known_hosts.old
-          KNOWN_HOSTS_FILE="$(realpath ./known_hosts)"
           
           # Create file for ssh key
           echo "${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}" > ./deploy.key
+          # Restrict access or else ssh will complain, that access rights are set to loosely
+          chmod 600 ./deploy.key
+
+          # Save those paths to be printed to config
+          KNOWN_HOSTS_FILE="$(realpath ./known_hosts)"
           DEPLOY_KEY_FILE="$(realpath ./deploy.key)"
-          
-          echo $DEPLOY_KEY_FILE
           
           # Create ssh config file for ease of use later on
           cat >> ./ssh_config << EOF
