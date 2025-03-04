@@ -9,18 +9,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Setup SSH
+        run: |
+          mkdir ssh-stuff
+          cd ssh-stuff
+          
+          # Create known_hosts, so we can connect via ssh without confirming stuff 
+          ssh-keyscan 217.160.208.40 >> ./known_hosts
+          ssh-keygen -H -f ./known_hosts
+          rm ./known_hosts.old
+          
+          # Create file for ssh key
+          echo "${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}" > ./deploy.key
+          # Restrict access or else ssh will complain, that access rights are set to loosely
+          chmod 600 ./deploy.key
+          
+          # Save those paths to be printed to config
+          KNOWN_HOSTS_FILE="$(realpath ./known_hosts)"
+          DEPLOY_KEY_FILE="$(realpath ./deploy.key)"
+          
+          # Create ssh config file for ease of use later on
+          cat >> ./ssh_config << EOF
+          Host VPS
+              hostname 217.160.208.40
+              Port 22
+              User deploy
+              UserKnownHostsFile $KNOWN_HOSTS_FILE
+              IdentityFile $DEPLOY_KEY_FILE
+              Preferredauthentications publickey
+              AddKeysToAgent yes
+              TCPKeepAlive yes
+          EOF
+          
+          # Save for later use
+          SSH_CONFIG_FILE="$(realpath ./ssh_config)"
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           sparse-checkout: 'deployment'
 
-      - name: Make deletion script executable
-        run: chmod +x ./deployment/Remove-Docker-Deployment.sh
-
       - name: Run deletion-script on VPS
-        uses: appleboy/ssh-action@v1.2.1
-        with:
-          host: 217.160.208.40
-          username: deploy
-          key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
-          script_path: ./deployment/Remove-Docker-Deployments.sh
+        run: ssh -F $SSH_CONFIG_FILE VPS "$(cat ./deployment/Remove-Docker-Deployment.sh)"
