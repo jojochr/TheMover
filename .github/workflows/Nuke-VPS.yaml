@@ -46,9 +46,9 @@ jobs:
           ssh -F ./ssh-stuff/ssh_config VPS "
           if [ "$(docker stack ls)" == *"TheMover"*]
           then
-            docker stack rm TheMover
-          else
             echo "TheMover stack is currently not deployed"
+          else
+            docker stack rm TheMover
           fi"
 
       - name: Remove TheMover Containers (if any are still running)
@@ -58,9 +58,9 @@ jobs:
           
           if [[ -z "$ENTRIES_TO_REMOVE" ]]
           then
-            docker rm $ENTRIES_TO_REMOVE
-          else
             echo "No containers left to remove"
+          else
+            docker rm $ENTRIES_TO_REMOVE
           fi
           
           unset ENTRIES_TO_REMOVE"
@@ -72,9 +72,9 @@ jobs:
           
           if [[ -z "$ENTRIES_TO_REMOVE" ]]
           then
-            docker rmi $ENTRIES_TO_REMOVE
-          else
             echo "No images left to remove"
+          else
+            docker rmi $ENTRIES_TO_REMOVE
           fi
           
           unset ENTRIES_TO_REMOVE"
@@ -86,9 +86,9 @@ jobs:
           
           if [[ -z "$ENTRIES_TO_REMOVE" ]]
           then
-            docker volume rm -f $$ENTRIES_TO_REMOVE
-          else
             echo "No volumes left to remove"
+          else
+            docker volume rm -f $$ENTRIES_TO_REMOVE
           fi
 
           unset ENTRIES_TO_REMOVE"
@@ -100,9 +100,9 @@ jobs:
           
           if [[ -z "$ENTRIES_TO_REMOVE" ]]
           then
-          docker network rm -f $ENTRIES_TO_REMOVE
-          else
             echo "No networks left to remove"
+          else
+            docker network rm -f $ENTRIES_TO_REMOVE
           fi
           
           unset ENTRIES_TO_REMOVE"
