@@ -20,7 +20,7 @@ jobs:
           rm ./known_hosts.old
           
           # Create file for ssh key
-          echo ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }} >> ./deploy.key
+          echo "${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}" > ./deploy.key
           DEPLOY_KEY_FILE="(realpath deploy.key)"
           
           # Create ssh config file for ease of use later on
