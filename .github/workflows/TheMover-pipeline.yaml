@@ -2,8 +2,6 @@ name: Deploy TheMover Stack to VPS
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 
 permissions:
   packages: write
