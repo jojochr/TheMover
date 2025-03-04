@@ -9,98 +9,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Setup SSH
-        run: |
-          mkdir ssh-stuff
-          cd ssh-stuff
-          # Create known_hosts, so we can connect via ssh without confirming stuff 
-          ssh-keyscan 217.160.208.40 >> ./known_hosts
-          ssh-keygen -H -f ./known_hosts
-          rm ./known_hosts.old
-          
-          # Create file for ssh key
-          echo "${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}" > ./deploy.key
-          # Restrict access or else ssh will complain, that access rights are set to loosely
-          chmod 600 ./deploy.key
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: './deployment'
 
-          # Save those paths to be printed to config
-          KNOWN_HOSTS_FILE="$(realpath ./known_hosts)"
-          DEPLOY_KEY_FILE="$(realpath ./deploy.key)"
-          
-          # Create ssh config file for ease of use later on
-          cat >> ./ssh_config << EOF
-          Host VPS
-              hostname 217.160.208.40
-              Port 22
-              User deploy
-              UserKnownHostsFile $KNOWN_HOSTS_FILE
-              IdentityFile $DEPLOY_KEY_FILE
-              Preferredauthentications publickey
-              AddKeysToAgent yes
-              TCPKeepAlive yes
-          EOF
-
-      - name: Remove TheMover Stack
-        run: |
-          ENTRIES_TO_REMOVE=$(ssh -F ./ssh-stuff/ssh_config VPS "docker stack ls")
-          
-          if [ "$ENTRIES_TO_REMOVE" == *"TheMover"*]
-          then
-            ssh -F ./ssh-stuff/ssh_config VPS "docker stack rm $TheMover"
-          else
-            echo "TheMover stack is currently not deployed"
-          fi
-          
-          unset ENTRIES_TO_REMOVE
-
-      - name: Remove TheMover Containers (if any are still running)
-        run: |
-          ENTRIES_TO_REMOVE=$(ssh -F ./ssh-stuff/ssh_config VPS "docker container ls --filter name="TheMover*" -q")
-          
-          if [[ -z "$ENTRIES_TO_REMOVE" ]]
-          then
-            echo "No containers left to remove"
-          else
-            ssh -F ./ssh-stuff/ssh_config VPS "docker rm \"$ENTRIES_TO_REMOVE\""
-          fi
-          
-          unset ENTRIES_TO_REMOVE
-
-      - name: Remove TheMover images
-        run: |
-          ENTRIES_TO_REMOVE=$(ssh -F ./ssh-stuff/ssh_config VPS "docker images --filter reference="*/*/the-mover*" -q")
-          
-          if [[ -z "$ENTRIES_TO_REMOVE" ]]
-          then
-            echo "No images left to remove"
-          else
-            ssh -F ./ssh-stuff/ssh_config VPS "docker rmi \"$ENTRIES_TO_REMOVE\""
-          fi
-          
-          unset ENTRIES_TO_REMOVE
-
-      - name: Remove TheMover volumes
-        run: |
-          ENTRIES_TO_REMOVE=$(ssh -F ./ssh-stuff/ssh_config VPS "docker volume ls --filter name="TheMover*" -q")
-          
-          if [[ -z "$ENTRIES_TO_REMOVE" ]]
-          then
-            echo "No volumes left to remove"
-          else
-            ssh -F ./ssh-stuff/ssh_config VPS "docker volume rm -f \"$ENTRIES_TO_REMOVE\""
-          fi
-
-          unset ENTRIES_TO_REMOVE
-
-      - name: Remove TheMover networks
-        run: |
-          ENTRIES_TO_REMOVE=$(ssh -F ./ssh-stuff/ssh_config VPS "docker network ls --filter name="TheMover*" -q")
-          
-          if [[ -z "$ENTRIES_TO_REMOVE" ]]
-          then
-            echo "No networks left to remove"
-          else
-            ssh -F ./ssh-stuff/ssh_config VPS "docker network rm -f \"$ENTRIES_TO_REMOVE\""
-          fi
-          
-          unset ENTRIES_TO_REMOVE
+      - name: Run deletion-script on VPS
+        uses: appleboy/ssh-action@v1.2.1
+        with:
+          host: 217.160.208.40
+          username: deploy
+          key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          script: |
+            cd deployment
+            chmod +x Remove-Docker-Deployments.sh
+            ./Remove-Docker-Deployments.sh
