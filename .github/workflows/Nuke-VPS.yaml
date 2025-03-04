@@ -12,7 +12,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          sparse-checkout: './deployment'
+          sparse-checkout: 'deployment'
+
+      - name: Make deletion script executable
+        run: chmod +x ./deployment/Remove-Docker-Deployment.sh
 
       - name: Run deletion-script on VPS
         uses: appleboy/ssh-action@v1.2.1
@@ -20,6 +23,4 @@ jobs:
           host: 217.160.208.40
           username: deploy
           key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
-          script: |
-            chmod +x deployment/Remove-Docker-Deployments.sh
-            ./deployment/Remove-Docker-Deployments.sh
+          script_path: ./deployment/Remove-Docker-Deployments.sh
