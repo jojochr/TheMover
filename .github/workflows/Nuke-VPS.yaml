@@ -42,7 +42,7 @@ jobs:
 
       - name: Remove TheMover Stack
         run: |
-          ENTRIES_TO_REMOVE="$(ssh -F ./ssh-stuff/ssh_config VPS \"docker stack ls\")"
+          ENTRIES_TO_REMOVE=$(ssh -F ./ssh-stuff/ssh_config VPS "docker stack ls")
           
           if [ "$ENTRIES_TO_REMOVE" == *"TheMover"*]
           then
@@ -55,52 +55,52 @@ jobs:
 
       - name: Remove TheMover Containers (if any are still running)
         run: |
-          ENTRIES_TO_REMOVE="$(ssh -F ./ssh-stuff/ssh_config VPS \"docker container ls --filter name=\"TheMover*\" -q\")"
+          ENTRIES_TO_REMOVE=$(ssh -F ./ssh-stuff/ssh_config VPS "docker container ls --filter name="TheMover*" -q")
           
           if [[ -z "$ENTRIES_TO_REMOVE" ]]
           then
             echo "No containers left to remove"
           else
-            ssh -F ./ssh-stuff/ssh_config VPS "docker rm $ENTRIES_TO_REMOVE"
+            ssh -F ./ssh-stuff/ssh_config VPS "docker rm \"$ENTRIES_TO_REMOVE\""
           fi
           
-          unset ENTRIES_TO_REMOVE"
+          unset ENTRIES_TO_REMOVE
 
       - name: Remove TheMover images
         run: |
-          ENTRIES_TO_REMOVE="$(ssh -F ./ssh-stuff/ssh_config VPS \"docker images --filter reference=\"*/*/the-mover*\" -q\")"
+          ENTRIES_TO_REMOVE=$(ssh -F ./ssh-stuff/ssh_config VPS "docker images --filter reference="*/*/the-mover*" -q")
           
           if [[ -z "$ENTRIES_TO_REMOVE" ]]
           then
             echo "No images left to remove"
           else
-            ssh -F ./ssh-stuff/ssh_config VPS "docker rmi $ENTRIES_TO_REMOVE"
+            ssh -F ./ssh-stuff/ssh_config VPS "docker rmi \"$ENTRIES_TO_REMOVE\""
           fi
           
-          unset ENTRIES_TO_REMOVE"
+          unset ENTRIES_TO_REMOVE
 
       - name: Remove TheMover volumes
         run: |
-          ENTRIES_TO_REMOVE="$(ssh -F ./ssh-stuff/ssh_config VPS \"docker volume ls --filter name=\"TheMover*\" -q\")"
+          ENTRIES_TO_REMOVE=$(ssh -F ./ssh-stuff/ssh_config VPS "docker volume ls --filter name="TheMover*" -q")
           
           if [[ -z "$ENTRIES_TO_REMOVE" ]]
           then
             echo "No volumes left to remove"
           else
-            ssh -F ./ssh-stuff/ssh_config VPS "docker volume rm -f $ENTRIES_TO_REMOVE"
+            ssh -F ./ssh-stuff/ssh_config VPS "docker volume rm -f \"$ENTRIES_TO_REMOVE\""
           fi
 
-          unset ENTRIES_TO_REMOVE"
+          unset ENTRIES_TO_REMOVE
 
       - name: Remove TheMover networks
         run: |
-          ENTRIES_TO_REMOVE="$(ssh -F ./ssh-stuff/ssh_config VPS \"docker network ls --filter name=\"TheMover*\" -q\")"
+          ENTRIES_TO_REMOVE=$(ssh -F ./ssh-stuff/ssh_config VPS "docker network ls --filter name="TheMover*" -q")
           
           if [[ -z "$ENTRIES_TO_REMOVE" ]]
           then
             echo "No networks left to remove"
           else
-            ssh -F ./ssh-stuff/ssh_config VPS "docker network rm -f $ENTRIES_TO_REMOVE"
+            ssh -F ./ssh-stuff/ssh_config VPS "docker network rm -f \"$ENTRIES_TO_REMOVE\""
           fi
           
-          unset ENTRIES_TO_REMOVE"
+          unset ENTRIES_TO_REMOVE
