@@ -21,6 +21,5 @@ jobs:
           username: deploy
           key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
           script: |
-            cd deployment
-            chmod +x Remove-Docker-Deployments.sh
-            ./Remove-Docker-Deployments.sh
+            chmod +x deployment/Remove-Docker-Deployments.sh
+            ./deployment/Remove-Docker-Deployments.sh
