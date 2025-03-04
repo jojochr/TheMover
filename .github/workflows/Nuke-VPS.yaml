@@ -43,7 +43,8 @@ jobs:
           
           # Save for later use
           export SSH_CONFIG_FILE="$(realpath ./ssh_config)"
-
+          echo "SSH-Config Path:"
+          cat SSH_CONFIG_FILE
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
