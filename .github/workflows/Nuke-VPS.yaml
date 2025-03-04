@@ -1,4 +1,4 @@
-name: Nuke all TheMover infrastructure from VPS
+name: Nuke TheMover from VPS
 
 on:
   workflow_dispatch:
@@ -10,8 +10,9 @@ jobs:
 
     steps:
       - name: Setup SSH
-        working-directory: ./ssh-stuff
         run: |
+          mkdir ssh-stuff
+          cd ssh-stuff
           # Create known_hosts, so we can connect via ssh without confirming stuff 
           ssh-keyscan hostname >> ./known_hosts
           ssh-keygen -H -f ./known_hosts
