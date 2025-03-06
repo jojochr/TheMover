@@ -1,0 +1,13 @@
+name: Lint Code Base
+
+on:
+  workflow_dispatch:
+
+jobs:
+  do-nothing-this-is-tmp:
+    name: This does nothing and is just a placeholder
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: No-op
+        run: echo "Did nothing and returning now :)"
