@@ -13,12 +13,16 @@ else
 fi
 
 echo ""
+echo "Sleep a couple seconds for containers to shut down..."
+sleep 5s
+echo ""
+
 echo "Removing containers related to TheMover..."
 echo "(Should be gone already by removing the docker stack)"
 CONTAINERS_TO_REMOVE=( $(docker container ls --filter name="TheMover*" -q) )
 if [[ ${#CONTAINERS_TO_REMOVE[@]} -gt 0 ]]
 then
-  docker container rm "${CONTAINERS_TO_REMOVE[@]}"
+  docker container rm -f "${CONTAINERS_TO_REMOVE[@]}"
   echo "Removed \"${#CONTAINERS_TO_REMOVE[@]}\" containers"
 else
   echo "No containers left to remove"
