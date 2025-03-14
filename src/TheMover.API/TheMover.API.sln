@@ -2,12 +2,12 @@
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheMover.API", "TheMover.API\TheMover.API.csproj", "{CE9E6CA0-E192-4A24-AA2A-1FAFE50EBE74}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheMover.API", ".\TheMover.API.csproj", "{CE9E6CA0-E192-4A24-AA2A-1FAFE50EBE74}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deployment", "Deployment", "{5CA24E81-F6E5-423A-BDDD-4AADBFAB1254}"
 	ProjectSection(SolutionItems) = preProject
-		..\.github\workflows\TheMover-pipeline.yaml = ..\.github\workflows\TheMover-pipeline.yaml
-		..\docker-stack.yaml = ..\docker-stack.yaml
+		..\..\.github\workflows\Deploy_TheMover-API.yaml = ..\..\.github\workflows\Deploy_TheMover-API.yaml
+		..\..\deployment\docker-stack_API.yaml = ..\..\deployment\docker-stack_API.yaml
 	EndProjectSection
 EndProject
 Global
