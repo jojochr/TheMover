@@ -1,7 +1,6 @@
 services:
   traefik:
     image: traefik:v3.1.4
-    container_name: Traefik-reverse-proxy
     ports:
       # Only listen to default browser ports for now
       - "80:80"

@@ -1,6 +1,5 @@
 services:
   themover-api:
-    container_name: "TheMover-API"
     image: ghcr.io/jojochr/the-mover_api:${GIT_COMMIT_HASH:-latest}
     ports:
       # REST-API Port

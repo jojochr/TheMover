@@ -1,6 +1,5 @@
 services:
   themover-web:
-    container_name: "TheMover-Web"
     image: ghcr.io/jojochr/the-mover_web:${GIT_COMMIT_HASH:-latest}
     ports:
       # Web Frontend
