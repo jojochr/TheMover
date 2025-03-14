@@ -1,0 +1,40 @@
+services:
+  themover-api:
+    container_name: "TheMover-API"
+    image: ghcr.io/jojochr/the-mover_api:${GIT_COMMIT_HASH:-latest}
+    ports:
+      # REST-API Port
+      - mode: host
+        protocol: tcp
+        published: 5000 #Facing the public
+        target: 5000    #Mapped to port inside the container
+      # GRPC-Interface Port
+      - mode: host
+        protocol: tcp
+        published: 5001 #Facing the public
+        target: 5001    #Mapped to port inside the container
+    labels:
+      - traefik.enable=true
+
+      # Create traefik router to reroute rest-api requests to the correct container port
+      - traefik.http.routers.themover-restapi.rule=Host(`api.themover.site`)
+      - traefik.http.routers.themover-restapi.tls=true
+      - traefik.http.routers.themover-restapi.tls.certresolver=cloudflare
+      - traefik.http.routers.themover-restapi.entrypoints=websecure
+      - traefik.http.routers.themover-restapi.service=restapi-service
+      - traefik.http.services.restapi-service.loadbalancer.server.port=5000
+
+      # Create traefik router to reroute grpc requests to the correct container port
+      - traefik.http.routers.themover-grpc.rule=Host(`grpc.themover.site`)
+      - traefik.http.routers.themover-grpc.tls=true
+      - traefik.http.routers.themover-grpc.tls.certresolver=cloudflare
+      - traefik.http.routers.themover-grpc.entrypoints=websecure
+      - traefik.http.routers.themover-grpc.service=grpc-service
+      - traefik.http.services.grpc-service.loadbalancer.server.port=5001
+    networks:
+      - reverse_proxy
+    restart: unless-stopped
+
+networks:
+  reverse_proxy:
+    external: true

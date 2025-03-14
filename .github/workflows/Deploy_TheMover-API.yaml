@@ -1,0 +1,68 @@
+name: Deploy TheMover API to VPS
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/TheMover.API/**'
+      # Exclude files that are irrelevant for build output
+      - '!src/TheMover.API/Properties/launchSettings.json'
+      - '!src/TheMover.API/.editorconfig'
+      - '!src/TheMover.API/compose.yaml'
+
+permissions:
+  packages: write
+
+jobs:
+  build-and-push-api-image:
+    name: Build Docker image for hosted api and push to github registry
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: https://ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./src/TheMover.API
+          push: true
+          tags: |
+            ghcr.io/jojochr/the-mover_api:latest
+            ghcr.io/jojochr/the-mover_api:${{ github.sha }}
+
+  deploy:
+    name: Deploy API on VPS
+    runs-on: ubuntu-latest
+    needs:
+      - build-and-push-api-image
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: deployment
+
+      # Create environment file to hold
+      # - git hash to get the exact docker image for the current commit
+      - name: Create env file
+        run: |
+          echo "GIT_COMMIT_HASH=${{ github.sha }}" >> ./envfile
+
+      - name: Deploy API
+        uses: kitconcept/docker-stack-deploy@v1.2.0
+        with:
+          stack_name: TheMover_Backend
+          stack_file: ./deployment/docker-stack_API.yaml
+          remote_host: 217.160.208.40
+          remote_user: deploy
+          remote_private_key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          env_file: ./envfile
