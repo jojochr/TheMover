@@ -1,0 +1,60 @@
+name: 'Set Up SSH'
+description: 'This creates an ssh directory and with that all necessary files to connect to my VPS.
+              Subsequent actions only need to call "ssh -F <Path to ssh config file> VPS"
+              The Path to the SSH file is part of the output
+              CAUTION: Call this AFTER your checkout, or else the local workflow does not exist.
+              Additionally doing a checkout after setting up ssh might delete the ssh files.'
+
+inputs:
+  ssh-private-key:
+    description: 'Private key that will be written to private key file and used for ssh connections'
+    required: true
+  ssh-folder:
+    description: 'Folder that ssh files "private.key", "known_hosts" and "ssh_config" will be written to'
+    required: true
+    default: '.ssh'
+
+outputs:
+  ssh-config-path:
+      description: 'Where the "ssh_config" file is located at'
+      value: ${{ steps.internal-setup.outputs.ssh-config-path }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up SSH
+      id: internal-setup
+      shell: bash
+      run: |
+        mkdir ${{ inputs.ssh-folder }}
+        cd ${{ inputs.ssh-folder }}
+        
+        # Create known_hosts, so we can connect via ssh without confirming stuff
+        ssh-keyscan 217.160.208.40 >> ./known_hosts
+        ssh-keygen -H -f ./known_hosts
+        rm ./known_hosts.old
+        
+        # Create file for ssh key
+        echo "${{ inputs.ssh-private-key }}" > ./deploy.key
+        # Restrict access or else ssh will complain, that access rights are set to loosely
+        chmod 600 ./deploy.key
+        
+        # Save those paths to be printed to config
+        KNOWN_HOSTS_FILE="$(realpath ./known_hosts)"
+        DEPLOY_KEY_FILE="$(realpath ./deploy.key)"
+        
+        # Create ssh config file for ease of use later on
+        cat >> ./ssh_config << EOF
+        Host VPS
+            hostname 217.160.208.40
+            Port 22
+            User deploy
+            UserKnownHostsFile $KNOWN_HOSTS_FILE
+            IdentityFile $DEPLOY_KEY_FILE
+            Preferredauthentications publickey
+            AddKeysToAgent yes
+            TCPKeepAlive yes
+        EOF
+        
+        # Write path of config file into output
+        echo "ssh-config-path=$(realpath ./ssh_config)" >> $GITHUB_OUTPUT

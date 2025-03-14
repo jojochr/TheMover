@@ -1,0 +1,27 @@
+name: Nuke TheMover from VPS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  delete-all-docker-components:
+    name: Remove all docker components tied to my TheMover Deployment
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github
+            deployment
+
+      # Do this after Checkout -> Because Checkout deletes home directory
+      - name: Set up SSH
+        id: set-up-ssh
+        uses: ./.github/actions/set-up-ssh
+        with:
+          ssh-private-key: '${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}'
+
+      - name: Run deletion-script on VPS
+        run: ssh -F ${{ steps.set-up-ssh.outputs.ssh-config-path }} VPS 'bash -s' < ./deployment/Remove-Docker-Deployment.sh

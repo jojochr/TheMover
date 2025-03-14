@@ -1,0 +1,67 @@
+name: Deploy TheMover Website to VPS
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/TheMover.Web/**'
+      # Exclude files that are irrelevant for build output
+      - '!src/TheMover.Web/.run/**'
+      - '!src/TheMover.Web/.gitignore'
+      - '!src/TheMover.Web/compose.yaml'
+
+permissions:
+  packages: write
+
+jobs:
+  build-and-push-web-image:
+    name: Build Docker image for hosted website and push to github registry
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: https://ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./src/TheMover.Web
+          push: true
+          tags: |
+            ghcr.io/jojochr/the-mover_web:latest
+            ghcr.io/jojochr/the-mover_web:${{ github.sha }}
+
+  deploy:
+    name: Deploy Website on VPS
+    runs-on: ubuntu-latest
+    needs:
+      - build-and-push-web-image
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.CLONE_ANY_JOJOCHR_REPOSITORY_TOKEN }}
+
+      - name: Docker Stack/Swarm Deploy
+        uses: leonidgrishenkov/docker-stack-deploy@v1.2.4
+        with:
+          registry: "ghcr.io"
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          stack_name: TheMover_Frontend
+          stack_file: ./deployment/docker-stack_Web.yaml
+          remote_host: 217.160.208.40
+          remote_port: '22'
+          remote_user: deploy
+          remote_private_key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          env_file: |
+            GIT_COMMIT_HASH=${{ github.sha }}
