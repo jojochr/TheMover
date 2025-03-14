@@ -29,6 +29,8 @@ jobs:
   traefik-stack-deploy:
     name: Traefik Stack-Deploy
     runs-on: ubuntu-latest
+    needs:
+      - prepare-proxy-environment
 
     steps:
       - name: Checkout repository
