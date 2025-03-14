@@ -1,0 +1,53 @@
+name: Create Reverse Proxy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  prepare-proxy-environment:
+    name: Prepare VPS environment
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            .github
+            deployment
+
+      # Do this after Checkout (checkout deletes default directory)
+      - name: Set up SSH
+        id: set-up-ssh
+        uses: ./.github/actions/set-up-ssh
+        with:
+          ssh-private-key: '${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}'
+
+      - name: Prepare Network and Volume for Proxy
+        run: ssh -F ${{ steps.set-up-ssh.outputs.ssh-config-path }} VPS 'bash -s' < ./deployment/Preparations-for-ReverseProxy.sh
+
+  traefik-stack-deploy:
+    name: Traefik Stack-Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: deployment
+
+      # Create environment file to hold
+      # - my cloudflare API Token so Traefik can do DNS-challenge
+      - name: Create env file
+        run: |
+          echo "CLOUDFLARE_DNS_API_TOKEN=${{ secrets.CLOUDFLARE_DOMAIN_TOKEN_THEMOVER }}" >> ./envfile
+
+      - name: Deploy Traefik
+        uses: kitconcept/docker-stack-deploy@v1.2.0
+        with:
+          stack_name: VPS-Proxy
+          stack_file: ./deployment/docker-stack_ReverseProxy.yaml
+          remote_host: 217.160.208.40
+          remote_user: deploy
+          remote_private_key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          env_file: ./envfile
