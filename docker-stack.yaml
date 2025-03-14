@@ -1,46 +1,5 @@
 services:
-  traefik:
-    image: traefik:v3.1.4
-    container_name: Traefik-reverse-proxy
-    ports:
-      # Only listen to default browser ports for now
-      - "80:80"
-      - "443:443"
-    command:
-      - "--global.checknewversion=false"
-      - "--global.sendanonymoususage=false"
 
-      # Use docker as my provider
-      - "--providers.docker"
-      - "--providers.docker.exposedByDefault=false"
-      - "--providers.docker.endpoint=unix:///var/run/docker.sock" # Because I know my vps is linux I use this path
-
-      # Create my main HTTPS entrypoint named websecure
-      - "--entryPoints.websecure.address=:443"
-      # Create my secondary HTTP entrypoint named web
-      - "--entrypoints.web.address=:80"
-      # Configure HTTP redirection 
-      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-
-      # Configure cloudflare resolver
-      - "--certificatesresolvers.cloudflare.acme.email=johannes.christel@outlook.de" # Use Environment variable for this
-      - "--certificatesresolvers.cloudflare.acme.storage=/letsencrypt/cloudflare-acme.json"
-      - "--certificatesresolvers.cloudflare.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
-      - "--certificatesresolvers.cloudflare.acme.keytype=EC256"
-      # Convigure ACME dns-challenge settings
-      - "--certificatesresolvers.cloudflare.acme.dnschallenge=true"
-      - "--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare"
-      - "--certificatesresolvers.cloudflare.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53"
-    environment:
-      - CLOUDFLARE_DNS_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN} # Grab cloudflare token from environment
-    volumes:
-      # This volume mount is only possible, because I know this is the correct path on my vps
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      # Use the shared certificates volume
-      - traefik_certs:/letsencrypt
-    restart: unless-stopped
-  
   themover-web:
     container_name: "TheMover-Web"
     image: ghcr.io/jojochr/the-mover_web:${GIT_COMMIT_HASH:-latest}
