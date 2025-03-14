@@ -1,0 +1,27 @@
+services:
+  themover-web:
+    container_name: "TheMover-Web"
+    image: ghcr.io/jojochr/the-mover_web:${GIT_COMMIT_HASH:-latest}
+    ports:
+      # Web Frontend
+      - mode: host
+        protocol: tcp
+        published: 4999
+        target: 4999
+    labels:
+      - traefik.enable=true
+
+      # Create traefik router to reroute
+      - traefik.http.routers.themover-web.rule=Host(`themover.site`)
+      - traefik.http.routers.themover-web.tls=true
+      - traefik.http.routers.themover-web.tls.certresolver=cloudflare
+      - traefik.http.routers.themover-web.entrypoints=websecure
+      - traefik.http.routers.themover-web.service=web-service
+      - traefik.http.services.web-service.loadbalancer.server.port=4999
+    networks:
+      - reverse_proxy
+    restart: unless-stopped
+
+networks:
+  reverse_proxy:
+    external: true
