@@ -51,18 +51,17 @@ jobs:
         with:
           token: ${{ secrets.CLONE_ANY_JOJOCHR_REPOSITORY_TOKEN }}
 
-      # Create environment file to hold
-      # - git hash to get the exact docker image for the current commit
-      - name: Create env file
-        run: |
-          echo "GIT_COMMIT_HASH=${{ github.sha }}" >> ./envfile
-
-      - name: Deploy Website
-        uses: kitconcept/docker-stack-deploy@v1.2.0
+      - name: Docker Stack/Swarm Deploy
+        uses: leonidgrishenkov/docker-stack-deploy@v1.2.4
         with:
+          registry: "ghcr.io"
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           stack_name: TheMover_Frontend
           stack_file: ./deployment/docker-stack_Web.yaml
           remote_host: 217.160.208.40
+          remote_port: '22'
           remote_user: deploy
           remote_private_key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
-          env_file: ./envfile
+          env_file: |
+            GIT_COMMIT_HASH=${{ github.sha }}

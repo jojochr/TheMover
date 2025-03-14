@@ -36,18 +36,17 @@ jobs:
         with:
           sparse-checkout: deployment
 
-      # Create environment file to hold
-      # - my cloudflare API Token so Traefik can do DNS-challenge
-      - name: Create env file
-        run: |
-          echo "CLOUDFLARE_DNS_API_TOKEN=${{ secrets.CLOUDFLARE_DOMAIN_TOKEN_THEMOVER }}" >> ./envfile
-
-      - name: Deploy Traefik
-        uses: kitconcept/docker-stack-deploy@v1.2.0
+      - name: Docker Stack/Swarm Deploy
+        uses: leonidgrishenkov/docker-stack-deploy@v1.2.4
         with:
+          registry: "ghcr.io"
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           stack_name: VPS-Proxy
           stack_file: ./deployment/docker-stack_ReverseProxy.yaml
           remote_host: 217.160.208.40
+          remote_port: '22'
           remote_user: deploy
           remote_private_key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
-          env_file: ./envfile
+          env_file: |
+            CLOUDFLARE_DNS_API_TOKEN=${{ secrets.CLOUDFLARE_DOMAIN_TOKEN_THEMOVER }}
