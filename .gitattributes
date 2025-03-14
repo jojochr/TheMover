@@ -1,0 +1,3 @@
+# This makes it so we all commit with crlf line endings
+# We defined crlf as correct in editorconfig -> Now Linting will complain if we commit code with linux line endings
+* text eol=crlf
