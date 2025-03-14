@@ -36,7 +36,7 @@ if (app.Environment.IsDevelopment())
 
 // Create gRPC Endpoints
 app.MapGrpcService<GreeterService>()
-    .RequireHost("grpc.themover.site");
+    .RequireHost("*:5001", "grpc.themover.site");
 
 CreateRestEndpoints(app);
 
@@ -47,5 +47,5 @@ return;
 static void CreateRestEndpoints(WebApplication app)
 {
     app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909")
-        .RequireHost("api.themover.site");
+        .RequireHost("*:5000", "api.themover.site");
 }
